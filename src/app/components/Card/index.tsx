@@ -2,7 +2,9 @@ import { ArrowDownwardSharp } from '@mui/icons-material';
 import React from 'react';
 import { CardContainer, CardHeader } from './index.styled';
 
-const Card = () => {
+type Props = {};
+
+const Card = ({}: Props) => {
 	return (
 		<CardContainer>
 			<CardHeader>
