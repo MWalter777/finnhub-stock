@@ -57,7 +57,28 @@ const StockProvider = ({ children }: Props) => {
 		const newStock: StockHistory = {
 			stock,
 			alertPrice,
-			prices: [],
+			prices: [
+				{
+					timestamp: new Date(Date.now() - 5000).getTime(),
+					price: Math.random() * 1510,
+				},
+				{
+					timestamp: new Date(Date.now() - 7000).getTime(),
+					price: Math.random() * 1510,
+				},
+				{
+					timestamp: new Date(Date.now() - 8000).getTime(),
+					price: Math.random() * 1510,
+				},
+				{
+					timestamp: new Date(Date.now() - 9000).getTime(),
+					price: Math.random() * 1510,
+				},
+				{
+					timestamp: new Date(Date.now() - 15000).getTime(),
+					price: Math.random() * 1510,
+				},
+			],
 		};
 		console.log(newStock);
 		setHistoricalStocks((prev) => [...prev, newStock]);
@@ -69,11 +90,10 @@ const StockProvider = ({ children }: Props) => {
 			if (stocksFromLocalStorage) {
 				const currentStocks = JSON.parse(stocksFromLocalStorage) as IStock[];
 				setStocks(currentStocks);
-				console.log(JSON.parse(stocksFromLocalStorage));
 				return;
 			}
 			const stocksFromApi = await fetchStocks();
-			const stocks = stocksFromApi.slice(0, 100);
+			const stocks = stocksFromApi.slice(0, 1000);
 			setStocks(stocks);
 			localStorage.setItem('stocks', JSON.stringify(stocks));
 		};

@@ -7,7 +7,6 @@ import { useStockContext } from '@/app/Store/StockProvider';
 
 const TopCards = () => {
 	const { stockHistory } = useStockContext();
-	console.log({ stockHistory });
 	return (
 		<TopCardSection>
 			<Swiper
