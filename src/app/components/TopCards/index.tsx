@@ -3,10 +3,11 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { TopCardSection } from './index.styled';
 import Card from '../Card';
 import 'swiper/css';
-
-const cards = new Array(8).fill(0);
+import { useStockContext } from '@/app/Store/StockProvider';
 
 const TopCards = () => {
+	const { stockHistory } = useStockContext();
+	console.log({ stockHistory });
 	return (
 		<TopCardSection>
 			<Swiper
@@ -19,9 +20,9 @@ const TopCards = () => {
 				grabCursor={true}
 				loop={true}
 			>
-				{cards.map((_, index) => (
+				{stockHistory.map((sh, index) => (
 					<SwiperSlide key={index}>
-						<Card />
+						<Card stockHistory={sh} />
 					</SwiperSlide>
 				))}
 			</Swiper>

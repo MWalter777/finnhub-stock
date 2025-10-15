@@ -1,13 +1,61 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { FormSection } from './index.styled';
 import { Autocomplete, Button, TextField } from '@mui/material';
 import { IStock } from '@/app/types/Stock';
 import { useStockContext } from '@/app/Store/StockProvider';
 
+type FormState = {
+	stock: IStock | null;
+	alertPrice: number | null;
+};
+
 const StockToWatchForm = () => {
+	const autoCompletRef = useRef<any>(null);
+	const alertPriceRef = useRef<any>(null);
 	const { stocks, addStockHistory } = useStockContext();
+	const [historicalStock, setHistoricalStock] = useState<FormState>({
+		alertPrice: null,
+		stock: null,
+	});
+
 	const handleStockChange = (_: any, value: IStock | null) => {
-		console.log(value);
+		if (value) {
+			setHistoricalStock((prev) => ({
+				...prev,
+				stock: value,
+			}));
+		}
+	};
+
+	const handleAlertPrice = ({
+		target: { value },
+	}: {
+		target: { value: string };
+	}) => {
+		if (value) {
+			const alertPriceValue = parseInt(value);
+			if (!isNaN(alertPriceValue)) {
+				setHistoricalStock((prev) => ({
+					...prev,
+					alertPrice: alertPriceValue,
+				}));
+			}
+		}
+	};
+
+	const addStock = () => {
+		if (historicalStock?.stock && historicalStock?.alertPrice) {
+			addStockHistory(historicalStock.stock, historicalStock.alertPrice);
+			setHistoricalStock({
+				alertPrice: 0,
+				stock: null,
+			});
+			if (alertPriceRef.current && autoCompletRef.current) {
+				alertPriceRef.current.value = '';
+				autoCompletRef.current.value = '';
+			}
+			console.log({ alertPriceRef, autoCompletRef });
+		}
 	};
 
 	return (
@@ -21,7 +69,12 @@ const StockToWatchForm = () => {
 				id='stock-selected'
 				onChange={handleStockChange}
 				renderInput={(params) => (
-					<TextField {...params} label='Select a stock' variant='standard' />
+					<TextField
+						inputRef={autoCompletRef}
+						{...params}
+						label='Select a stock'
+						variant='standard'
+					/>
 				)}
 			/>
 			<TextField
@@ -31,8 +84,15 @@ const StockToWatchForm = () => {
 				variant='standard'
 				type='number'
 				className='w-full mt-4'
+				inputRef={alertPriceRef}
+				onChange={handleAlertPrice}
 			/>
-			<Button type='button' variant='contained' className='w-full'>
+			<Button
+				onClick={addStock}
+				type='button'
+				variant='contained'
+				className='w-full'
+			>
 				Add stock
 			</Button>
 		</FormSection>

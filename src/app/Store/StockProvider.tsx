@@ -1,7 +1,6 @@
 import React, {
 	createContext,
 	ReactElement,
-	useCallback,
 	useContext,
 	useEffect,
 	useState,
@@ -54,17 +53,15 @@ const StockProvider = ({ children }: Props) => {
 	const [stocks, setStocks] = useState<IStock[]>([]);
 	const [historicalStocks, setHistoricalStocks] = useState<StockHistory[]>([]);
 
-	const updateHistoricalStock = useCallback(
-		(stock: IStock, alertPrice: number) => {
-			const newStock: StockHistory = {
-				stock,
-				alertPrice,
-				prices: [],
-			};
-			setHistoricalStocks((prev) => [...prev, newStock]);
-		},
-		[]
-	);
+	const updateHistoricalStock = (stock: IStock, alertPrice: number) => {
+		const newStock: StockHistory = {
+			stock,
+			alertPrice,
+			prices: [],
+		};
+		console.log(newStock);
+		setHistoricalStocks((prev) => [...prev, newStock]);
+	};
 
 	useEffect(() => {
 		const getStocks = async () => {
