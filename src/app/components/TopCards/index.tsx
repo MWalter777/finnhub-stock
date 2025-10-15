@@ -1,10 +1,16 @@
 import React from 'react';
+import { TopCardSection } from './index.styled';
+import Card from '../Card';
+
+const cards = new Array(8).fill(0);
 
 const TopCards = () => {
 	return (
-		<section className='bg-amber-500  w-full md:w-8/12 lg:w-9/12'>
-			<div>TopCards</div>
-		</section>
+		<TopCardSection>
+			{cards.map((_, index) => (
+				<Card key={index} />
+			))}
+		</TopCardSection>
 	);
 };
 
