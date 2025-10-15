@@ -3,6 +3,9 @@ import styled from 'styled-components';
 export const FormSection = styled.form`
 	width: 100%;
 	padding: 0 1rem;
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
 	div.MuiAutocomplete-root {
 		width: 100%;
 	}

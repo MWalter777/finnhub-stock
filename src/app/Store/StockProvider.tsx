@@ -2,26 +2,38 @@ import React, {
 	createContext,
 	ReactElement,
 	useCallback,
+	useContext,
 	useEffect,
 	useState,
 } from 'react';
 import { IStock } from '../types/Stock';
 
+export type StockPricePoint = {
+	timestamp: number;
+	price: number;
+};
+
+export type StockHistory = {
+	stock: IStock;
+	alertPrice: number;
+	prices: StockPricePoint[];
+};
+
 type StockContext = {
 	stocks: IStock[];
-	stockSelected: IStock | null;
+	stockHistory: StockHistory[];
 };
 
 type StockActionContext = {
-	setStockSelected: (stock: IStock | null) => void;
+	addStockHistory: (stock: IStock, alertPrice: number) => void;
 };
 
 type StockFullContext = StockContext & StockActionContext;
 
 const defaultState: StockFullContext = {
 	stocks: [],
-	stockSelected: null,
-	setStockSelected: () => {},
+	stockHistory: [],
+	addStockHistory: () => {},
 };
 
 const stockContext = createContext<StockFullContext>(defaultState);
@@ -40,11 +52,19 @@ const fetchStocks = async (): Promise<IStock[]> => {
 
 const StockProvider = ({ children }: Props) => {
 	const [stocks, setStocks] = useState<IStock[]>([]);
-	const [stockSelected, setStockSelected] = useState<IStock | null>(null);
+	const [historicalStocks, setHistoricalStocks] = useState<StockHistory[]>([]);
 
-	const updateSelectedStock = useCallback((stock: IStock | null) => {
-		setStockSelected(stock);
-	}, []);
+	const updateHistoricalStock = useCallback(
+		(stock: IStock, alertPrice: number) => {
+			const newStock: StockHistory = {
+				stock,
+				alertPrice,
+				prices: [],
+			};
+			setHistoricalStocks((prev) => [...prev, newStock]);
+		},
+		[]
+	);
 
 	useEffect(() => {
 		const getStocks = async () => {
@@ -52,14 +72,12 @@ const StockProvider = ({ children }: Props) => {
 			if (stocksFromLocalStorage) {
 				const currentStocks = JSON.parse(stocksFromLocalStorage) as IStock[];
 				setStocks(currentStocks);
-				updateSelectedStock(currentStocks[0]);
 				console.log(JSON.parse(stocksFromLocalStorage));
 				return;
 			}
 			const stocksFromApi = await fetchStocks();
 			const stocks = stocksFromApi.slice(0, 100);
 			setStocks(stocks);
-			updateSelectedStock(stocks[0]);
 			localStorage.setItem('stocks', JSON.stringify(stocks));
 		};
 		getStocks();
@@ -69,8 +87,8 @@ const StockProvider = ({ children }: Props) => {
 		<stockContext.Provider
 			value={{
 				stocks,
-				stockSelected,
-				setStockSelected: updateSelectedStock,
+				stockHistory: historicalStocks,
+				addStockHistory: updateHistoricalStock,
 			}}
 		>
 			{children}
@@ -80,4 +98,4 @@ const StockProvider = ({ children }: Props) => {
 
 export default StockProvider;
 
-export const useStockContext = () => React.useContext(stockContext);
+export const useStockContext = () => useContext(stockContext);

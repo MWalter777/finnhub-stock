@@ -1,13 +1,13 @@
 import React from 'react';
 import { FormSection } from './index.styled';
-import { Autocomplete, TextField } from '@mui/material';
+import { Autocomplete, Button, TextField } from '@mui/material';
 import { IStock } from '@/app/types/Stock';
 import { useStockContext } from '@/app/Store/StockProvider';
 
 const StockToWatchForm = () => {
-	const { stocks, stockSelected, setStockSelected } = useStockContext();
+	const { stocks, addStockHistory } = useStockContext();
 	const handleStockChange = (_: any, value: IStock | null) => {
-		setStockSelected(value);
+		console.log(value);
 	};
 
 	return (
@@ -20,7 +20,6 @@ const StockToWatchForm = () => {
 				className='w-full'
 				id='stock-selected'
 				onChange={handleStockChange}
-				value={stockSelected}
 				renderInput={(params) => (
 					<TextField {...params} label='Select a stock' variant='standard' />
 				)}
@@ -33,6 +32,9 @@ const StockToWatchForm = () => {
 				type='number'
 				className='w-full mt-4'
 			/>
+			<Button type='button' variant='contained' className='w-full'>
+				Add stock
+			</Button>
 		</FormSection>
 	);
 };
