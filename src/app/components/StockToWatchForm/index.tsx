@@ -1,31 +1,45 @@
 'use client';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { FormSection } from './index.styled';
 import { Autocomplete, TextField } from '@mui/material';
+import { IStock } from '@/app/types/Stock';
+
+const url = `https://finnhub.io/api/v1/stock/symbol?exchange=US&token=${process.env.NEXT_PUBLIC_FINNHUB_API_KEY}`;
+
+const fetchStocks = async (): Promise<IStock[]> => {
+	const response = await fetch(url);
+	const data = await response.json();
+	return data;
+};
 
 const StockToWatchForm = () => {
-	const options = [
-		{ id: 1, name: 'The Shawshank Redemption', label: 'Shawshank' },
-		{ id: 2, name: 'The Godfather', label: 'Godfather' },
-		{ id: 3, name: 'The Dark Knight', label: 'Dark Knight' },
-	];
-	const handleStockChange = (
-		_: any,
-		value: {
-			id: number;
-			name: string;
-			label: string;
-		} | null
-	) => {
+	const [stocks, setStocks] = useState<IStock[]>([]);
+	useEffect(() => {
+		const getStocks = async () => {
+			const stocksFromLocalStorage = localStorage.getItem('stocks');
+			if (stocksFromLocalStorage) {
+				setStocks(JSON.parse(stocksFromLocalStorage));
+				console.log(JSON.parse(stocksFromLocalStorage));
+				return;
+			}
+			const stocksFromApi = await fetchStocks();
+			const stocks = stocksFromApi.slice(0, 100);
+			setStocks(stocks);
+			localStorage.setItem('stocks', JSON.stringify(stocks));
+		};
+		getStocks();
+	}, []);
+
+	const handleStockChange = (_: any, value: IStock | null) => {
 		console.log(value);
 	};
 	return (
 		<FormSection>
 			<Autocomplete
 				disablePortal
-				options={options}
-				getOptionLabel={(option) => option.label}
-				isOptionEqualToValue={(option, value) => option.id === value.id}
+				options={stocks}
+				getOptionLabel={(option) => option.symbol}
+				isOptionEqualToValue={(option, value) => option.symbol === value.symbol}
 				className='w-full'
 				id='stock-selected'
 				onChange={handleStockChange}
