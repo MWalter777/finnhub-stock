@@ -1,16 +1,28 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { StreamStockPrice } from '../types/Stock';
-import { StockHistory, StockPricePoint } from '../Store/StockProvider';
 import { PriceRecord } from '../types/StockSocket';
+import { StockHistory, StockPricePoint } from '../types/StockProvider';
 
 const API_KEY = process.env.NEXT_PUBLIC_FINNHUB_API_KEY;
 const SOCKET_URL = `wss://ws.finnhub.io?token=${API_KEY}`;
 
 export default function useStockSocket(
 	stockList: StockHistory[]
-): [PriceRecord, StockHistory[], (history: StockHistory) => void] {
+): [
+	PriceRecord,
+	StockHistory[],
+	(history: StockHistory) => void,
+	unsubscribeStock: (symbol: string) => void
+] {
 	const [prices, setPrices] = useState<PriceRecord>({});
 	const [history, setHistory] = useState<StockHistory[]>([]);
+
+	const saveInLocalStorage = (data: StockHistory[]) => {
+		console.log('Saving stock history to localStorage:', data);
+		if (typeof window !== 'undefined' && data.length > 0) {
+			localStorage.setItem('stockHistory', JSON.stringify(data));
+		}
+	};
 
 	useEffect(() => {
 		const socket = new WebSocket(SOCKET_URL);
@@ -68,7 +80,11 @@ export default function useStockSocket(
 			}
 		};
 
-		return () => socket.close();
+		return () => {
+			saveInLocalStorage(history);
+			socket.close();
+			console.log('WebSocket disconnected');
+		};
 	}, [stockList]);
 
 	const subscribeNewStock = (historicalStock: StockHistory) => {
@@ -84,8 +100,16 @@ export default function useStockSocket(
 				prevPrice: currentPrice,
 			},
 		}));
-		console.log('new subscription', historicalStock);
 	};
 
-	return [prices, history, subscribeNewStock];
+	const unsubscribeStock = (symbol: string) => {
+		setHistory((prev) => prev.filter((h) => h.stock.symbol !== symbol));
+		setPrices((prev) => {
+			const updatedPrices = { ...prev };
+			delete updatedPrices[symbol];
+			return updatedPrices;
+		});
+	};
+
+	return [prices, history, subscribeNewStock, unsubscribeStock];
 }

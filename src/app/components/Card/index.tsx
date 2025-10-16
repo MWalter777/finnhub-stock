@@ -2,6 +2,7 @@ import React from 'react';
 import { CardContainer, CardHeader } from './index.styled';
 import { useStockContext } from '@/app/Store/StockProvider';
 import { StockHistory } from '@/app/types/StockProvider';
+import CloseIcon from '@mui/icons-material/Close';
 import BodyCard from './BodyCard';
 
 type Props = {
@@ -9,7 +10,7 @@ type Props = {
 };
 
 const Card = ({ stockHistory }: Props) => {
-	const { stockPrices } = useStockContext();
+	const { stockPrices, removeStock } = useStockContext();
 	const priceData = stockPrices[stockHistory.stock.symbol] || {
 		price: 0,
 		prevPrice: 0,
@@ -21,6 +22,12 @@ const Card = ({ stockHistory }: Props) => {
 				border: isValueBelowAlert ? '2px solid red' : '2px solid green',
 			}}
 		>
+			<button
+				onClick={() => removeStock(stockHistory.stock.symbol)}
+				className='absolute right-2 top-0 hover:scale-110 transition-transform cursor-pointer'
+			>
+				<CloseIcon />
+			</button>
 			<CardHeader>
 				<h2>{stockHistory.stock.symbol}</h2>
 				<p>$ {priceData.price}</p>

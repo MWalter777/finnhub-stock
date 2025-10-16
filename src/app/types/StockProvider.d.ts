@@ -1,3 +1,5 @@
+import { IStock } from './Stock';
+
 export type StockPricePoint = {
 	timestamp: number;
 	price: number;

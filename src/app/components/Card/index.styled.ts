@@ -11,6 +11,7 @@ export const CardContainer = styled.div`
 	display: flex;
 	flex-direction: column;
 	gap: 12px;
+	position: relative;
 `;
 export const CardHeader = styled.div`
 	display: flex;

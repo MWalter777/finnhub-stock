@@ -22,6 +22,7 @@ type StockContext = {
 
 type StockActionContext = {
 	addStockHistory: (stock: IStock, alertPrice: number) => Promise<void>;
+	removeStock: (symbol: string) => void;
 };
 
 type StockFullContext = StockContext & StockActionContext;
@@ -31,6 +32,7 @@ const defaultState: StockFullContext = {
 	stockHistory: [],
 	stockPrices: {},
 	addStockHistory: async () => {},
+	removeStock: () => {},
 };
 
 const stockContext = createContext<StockFullContext>(defaultState);
@@ -41,13 +43,11 @@ type Props = {
 
 const StockProvider = ({ children }: Props) => {
 	const [stocks, setStocks] = useState<IStock[]>([]);
-	const [historicalStocks, setHistoricalStocks] = useState<StockHistory[]>([]);
-	const [stockPrices, stockHistory, subscribeNewStock] =
-		useStockSocket(historicalStocks);
+	const [stockPrices, stockHistory, subscribeNewStock, unsubscribeStock] =
+		useStockSocket([]);
 
 	const updateHistoricalStock = async (stock: IStock, alertPrice: number) => {
 		const initialData = await getInitialValueBySymbol(stock.symbol);
-		console.log({ initialData });
 		const prices: StockPricePoint[] = initialData?.c
 			? [
 					{
@@ -62,8 +62,22 @@ const StockProvider = ({ children }: Props) => {
 			alertPrice,
 			prices,
 		};
-		setHistoricalStocks((prev) => [...prev, newStock]);
+		const removedStockInUse = stocks.filter((s) => s.symbol !== stock.symbol);
+		setStocks(removedStockInUse);
 		subscribeNewStock(newStock);
+	};
+
+	const removeStock = (symbol: string) => {
+		console.log('Removing stock:', symbol);
+		const stock = stockHistory.find((s) => s.stock.symbol === symbol);
+		console.log('Found stock to remove:', {
+			stock,
+			stockHistory,
+		});
+		if (!stock) return;
+		const newListStocks: IStock[] = [stock.stock, ...stocks];
+		setStocks(newListStocks);
+		unsubscribeStock(stock.stock.symbol);
 	};
 
 	useEffect(() => {
@@ -88,6 +102,7 @@ const StockProvider = ({ children }: Props) => {
 				stockHistory: stockHistory,
 				stockPrices,
 				addStockHistory: updateHistoricalStock,
+				removeStock,
 			}}
 		>
 			{children}
