@@ -12,18 +12,7 @@ import {
 	getStockSymbols,
 } from '../utils/getStockSymbols';
 import { PriceRecord } from '../types/StockSocket';
-
-export type StockPricePoint = {
-	timestamp: number;
-	price: number;
-	prevPrice: number;
-};
-
-export type StockHistory = {
-	stock: IStock;
-	alertPrice: number;
-	prices: StockPricePoint[];
-};
+import { StockHistory, StockPricePoint } from '../types/StockProvider';
 
 type StockContext = {
 	stocks: IStock[];
