@@ -57,7 +57,12 @@ const GraphStocks = () => {
 							domain={['auto', 'auto']}
 							tickFormatter={(t) => new Date(t).toLocaleTimeString()}
 						/>
-						<YAxis />
+						<YAxis
+							domain={[
+								(dataMin: number) => dataMin * 0.999,
+								(dataMax: number) => dataMax * 1.001,
+							]}
+						/>
 						<Tooltip labelFormatter={(t) => new Date(t).toLocaleTimeString()} />
 						{stockHistory.map((sh, i) => {
 							return (
