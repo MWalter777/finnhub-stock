@@ -1,7 +1,7 @@
 import React from 'react';
 import { CardContainer, CardHeader } from './index.styled';
-import { useStockContext } from '@/app/Store/StockProvider';
-import { StockHistory } from '@/app/types/StockProvider';
+import { useStockContext } from '@/Store/StockProvider';
+import { StockHistory } from '@/types/StockProvider';
 import CloseIcon from '@mui/icons-material/Close';
 import BodyCard from './BodyCard';
 

@@ -87,14 +87,10 @@ const StockProvider = ({ children }: Props) => {
 
 	useEffect(() => {
 		const getStocks = async () => {
-			const stocksFromLocalStorage = localStorage.getItem('stocks');
-			loadFromLocalStorage();
-			if (stocksFromLocalStorage) {
-				const currentStocks = JSON.parse(stocksFromLocalStorage) as IStock[];
-				setStocks(currentStocks);
-				return;
-			}
-			const stocks = await getStockSymbols();
+			const stockSaved = loadFromLocalStorage();
+			const stocks = (await getStockSymbols()).filter(
+				(stock) => !stockSaved.find((s) => s.stock.symbol === stock.symbol)
+			);
 			setStocks(stocks);
 			localStorage.setItem('stocks', JSON.stringify(stocks));
 		};

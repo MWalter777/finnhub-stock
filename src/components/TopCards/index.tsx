@@ -3,7 +3,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { TopCardSection } from './index.styled';
 import Card from '../Card';
 import 'swiper/css';
-import { useStockContext } from '@/app/Store/StockProvider';
+import { useStockContext } from '@/Store/StockProvider';
 
 const TopCards = () => {
 	const { stockHistory } = useStockContext();

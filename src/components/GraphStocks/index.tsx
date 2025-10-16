@@ -1,5 +1,5 @@
-import { useStockContext } from '@/app/Store/StockProvider';
-import { StockHistory } from '@/app/types/StockProvider';
+import { useStockContext } from '@/Store/StockProvider';
+import { StockHistory } from '@/types/StockProvider';
 import React from 'react';
 import {
 	LineChart,

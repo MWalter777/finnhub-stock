@@ -13,7 +13,7 @@ export default function useStockSocket(
 	StockHistory[],
 	(history: StockHistory) => void,
 	(symbol: string) => void,
-	() => void
+	() => StockHistory[]
 ] {
 	const [prices, setPrices] = useState<PriceRecord>({});
 	const [history, setHistory] = useState<StockHistory[]>([]);
@@ -43,6 +43,7 @@ export default function useStockSocket(
 						}
 					});
 					setPrices(initialPrices);
+					return parsedData;
 				} catch (error) {
 					console.error(
 						'Error parsing stock history from localStorage:',
@@ -51,6 +52,7 @@ export default function useStockSocket(
 				}
 			}
 		}
+		return [];
 	};
 
 	useEffect(() => {
