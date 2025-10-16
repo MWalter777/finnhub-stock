@@ -10,17 +10,15 @@ import {
 	CartesianGrid,
 } from 'recharts';
 
-const TEN_SECONDS = 30000;
-
 function mergeHistory2(history: StockHistory[]) {
-	const now = Date.now();
 	const merged: any[] = [];
 	const symbols = history.map((h) => h.stock.symbol);
 	const allTimestamps = new Set<number>();
 
-	history.forEach((h) =>
-		h.prices.forEach((p) => allTimestamps.add(p.timestamp))
-	);
+	history.forEach((h) => {
+		const last30Prices = h.prices.filter((_, i) => i >= h.prices.length - 30);
+		last30Prices.forEach((p) => allTimestamps.add(p.timestamp));
+	});
 
 	const sortedTimestamps = Array.from(allTimestamps).sort((a, b) => a - b);
 
@@ -36,24 +34,6 @@ function mergeHistory2(history: StockHistory[]) {
 		});
 		merged.push(point);
 	});
-
-	const dataToShow = merged.filter((point) => point.time >= now - TEN_SECONDS);
-	return dataToShow;
-}
-
-function mergeHistory(history: StockHistory[]) {
-	const merged: any[] = [];
-	if (!history.length) return merged;
-
-	const maxLength = Math.max(...history.map((h) => h.prices.length));
-
-	for (let i = 0; i < maxLength; i++) {
-		const point: any = { time: history[0].prices[i]?.timestamp || Date.now() };
-		history.forEach((h) => {
-			point[h.stock.symbol] = h.prices[i]?.price ?? null;
-		});
-		merged.push(point);
-	}
 
 	return merged;
 }

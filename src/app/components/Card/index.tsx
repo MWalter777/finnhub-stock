@@ -21,7 +21,7 @@ const Card = ({ stockHistory }: Props) => {
 		(priceData.prevPrice
 			? (difference / priceData.prevPrice) * 100
 			: 0
-		).toFixed(8) +
+		).toFixed(4) +
 		'%';
 	const isValueBelowAlert = priceData.prevPrice < stockHistory.alertPrice;
 	console.log({ priceData, stockHistory });
@@ -41,7 +41,7 @@ const Card = ({ stockHistory }: Props) => {
 					<span>{percentageChange}</span>
 				</H2>
 				<span>
-					({symbol} {difference.toFixed(8)})
+					({symbol} {difference.toFixed(4)})
 				</span>
 			</div>
 		</CardContainer>

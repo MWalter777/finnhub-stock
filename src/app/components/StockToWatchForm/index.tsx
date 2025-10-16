@@ -10,6 +10,8 @@ type FormState = {
 	alertPrice: number | null;
 };
 
+const MAX_STOCKS = 7;
+
 const StockToWatchForm = () => {
 	const {
 		register,
@@ -23,7 +25,7 @@ const StockToWatchForm = () => {
 			alertPrice: null,
 		},
 	});
-	const { stocks, addStockHistory } = useStockContext();
+	const { stocks, addStockHistory, stockHistory } = useStockContext();
 
 	const onSubmit: SubmitHandler<FormState> = (data) => {
 		if (data.stock && data.alertPrice !== null) {
@@ -52,6 +54,7 @@ const StockToWatchForm = () => {
 						className='w-full'
 						value={field.value}
 						onChange={(_, newValue) => field.onChange(newValue)}
+						disabled={stockHistory.length >= MAX_STOCKS}
 						renderInput={(params) => (
 							<TextField
 								{...params}
@@ -71,6 +74,7 @@ const StockToWatchForm = () => {
 				type='number'
 				error={!!errors.alertPrice}
 				helperText={errors.alertPrice?.message}
+				disabled={stockHistory.length >= MAX_STOCKS}
 				slotProps={{
 					input: {
 						// @ts-ignore
@@ -90,7 +94,12 @@ const StockToWatchForm = () => {
 					},
 				})}
 			/>
-			<Button type='submit' variant='contained' className='w-full'>
+			<Button
+				disabled={stockHistory.length >= MAX_STOCKS}
+				type='submit'
+				variant='contained'
+				className='w-full'
+			>
 				Add stock
 			</Button>
 		</FormSection>
