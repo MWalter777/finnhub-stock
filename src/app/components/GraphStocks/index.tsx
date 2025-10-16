@@ -1,4 +1,5 @@
-import { StockHistory, useStockContext } from '@/app/Store/StockProvider';
+import { useStockContext } from '@/app/Store/StockProvider';
+import { StockHistory } from '@/app/types/StockProvider';
 import React from 'react';
 import {
 	LineChart,
@@ -9,6 +10,7 @@ import {
 	ResponsiveContainer,
 	CartesianGrid,
 } from 'recharts';
+import { ChartWrapper, Container } from './index.styled';
 
 function mergeHistory2(history: StockHistory[]) {
 	const merged: any[] = [];
@@ -47,8 +49,8 @@ const GraphStocks = () => {
 	const { stockHistory } = useStockContext();
 	const mergedData = mergeHistory2(stockHistory);
 	return (
-		<section className=' w-full'>
-			<div style={{ width: '100%', height: 300 }}>
+		<Container>
+			<ChartWrapper>
 				<ResponsiveContainer>
 					<LineChart data={mergedData}>
 						<CartesianGrid stroke='#ccc' strokeDasharray='5 5' />
@@ -62,6 +64,7 @@ const GraphStocks = () => {
 								(dataMin: number) => dataMin * 0.999,
 								(dataMax: number) => dataMax * 1.001,
 							]}
+							tickFormatter={(value) => value.toFixed(2)}
 						/>
 						<Tooltip labelFormatter={(t) => new Date(t).toLocaleTimeString()} />
 						{stockHistory.map((sh, i) => {
@@ -79,8 +82,8 @@ const GraphStocks = () => {
 						})}
 					</LineChart>
 				</ResponsiveContainer>
-			</div>
-		</section>
+			</ChartWrapper>
+		</Container>
 	);
 };
 

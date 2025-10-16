@@ -23,7 +23,7 @@ const Card = ({ stockHistory }: Props) => {
 		>
 			<CardHeader>
 				<h2>{stockHistory.stock.symbol}</h2>
-				<p>{priceData.price}</p>
+				<p>$ {priceData.price}</p>
 			</CardHeader>
 			<BodyCard priceData={priceData} />
 		</CardContainer>
