@@ -9,33 +9,6 @@ const fetchStocks = async <T>(url: string): Promise<T> => {
 	return data;
 };
 
-const testStock: IStock[] = [
-	{
-		symbol: 'BINANCE:BTCUSDT',
-		currency: 'USD',
-		description: 'Bitcoin US Dollar',
-		displaySymbol: 'BTCUSDT',
-		type: 'crypto',
-		mic: 'BINANCE',
-		figi: 'BBG001S5N8V8',
-		shareClassFIGI: '',
-		isin: null,
-		symbol2: 'BTCUSDT',
-	},
-	{
-		symbol: 'IC MARKETS:1',
-		currency: 'USD',
-		description: 'S&P 500',
-		displaySymbol: 'SPX500',
-		type: 'index',
-		mic: 'IC MARKETS',
-		figi: 'BBG001S5N8V8',
-		shareClassFIGI: '',
-		isin: null,
-		symbol2: 'SPX500',
-	},
-];
-
 const principalStocks = [
 	'MSFT',
 	'AAPL',

@@ -12,8 +12,10 @@ import {
 } from 'recharts';
 import { ChartWrapper, Container } from './index.styled';
 
-function mergeHistory2(history: StockHistory[]) {
-	const merged: any[] = [];
+function mergeHistory(history: StockHistory[]) {
+	const merged: {
+		[x: string]: number | null;
+	}[] = [];
 	const symbols = history.map((h) => h.stock.symbol);
 	const allTimestamps = new Set<number>();
 
@@ -24,9 +26,9 @@ function mergeHistory2(history: StockHistory[]) {
 
 	const sortedTimestamps = Array.from(allTimestamps).sort((a, b) => a - b);
 
-	let lastValues: Record<string, number> = {};
+	const lastValues: Record<string, number> = {};
 	sortedTimestamps.forEach((ts) => {
-		const point: any = { time: ts };
+		const point: { [key in string]: number | null } = { time: ts };
 		symbols.forEach((sym) => {
 			const pricePoint = history
 				.find((h) => h.stock.symbol === sym)
@@ -47,7 +49,7 @@ function getColor(i: number) {
 
 const GraphStocks = () => {
 	const { stockHistory } = useStockContext();
-	const mergedData = mergeHistory2(stockHistory);
+	const mergedData = mergeHistory(stockHistory);
 	return (
 		<Container>
 			<ChartWrapper>

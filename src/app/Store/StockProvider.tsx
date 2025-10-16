@@ -99,6 +99,7 @@ const StockProvider = ({ children }: Props) => {
 			localStorage.setItem('stocks', JSON.stringify(stocks));
 		};
 		getStocks();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	return (

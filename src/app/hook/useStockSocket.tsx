@@ -78,10 +78,10 @@ export default function useStockSocket(
 						price: trade.p,
 						prevPrice: prevPrice,
 					};
-					setHistory((prevHist: any[]) => {
-						const stockHist: StockHistory = prevHist.find(
+					setHistory((prevHist: StockHistory[]) => {
+						const stockHist: StockHistory | undefined = prevHist.find(
 							(h) => h.stock.symbol === trade.s
-						) as any;
+						);
 						const pricePoint: StockPricePoint = {
 							timestamp: trade.t,
 							price: trade.p,
@@ -89,17 +89,8 @@ export default function useStockSocket(
 						};
 						if (stockHist) {
 							stockHist.prices.push(pricePoint);
-							return [...prevHist];
-						} else {
-							return [
-								...prevHist,
-								{
-									stock: { symbol: trade.s, alertPrice: 0 },
-									prices: [pricePoint],
-									alertPrice: 0,
-								},
-							];
 						}
+						return [...prevHist];
 					});
 				});
 				setPrices((prev) => ({

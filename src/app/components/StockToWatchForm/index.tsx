@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React from 'react';
 import { FormSection } from './index.styled';
 import { Autocomplete, Button, TextField } from '@mui/material';
 import { IStock } from '@/app/types/Stock';
@@ -77,7 +77,6 @@ const StockToWatchForm = () => {
 				disabled={stockHistory.length >= MAX_STOCKS}
 				slotProps={{
 					input: {
-						// @ts-ignore
 						inputProps: {
 							step: 'any',
 						},

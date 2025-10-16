@@ -1,7 +1,6 @@
 import React from 'react';
 import { H2 } from './index.styled';
 import { ArrowDownwardSharp, ArrowUpwardSharp } from '@mui/icons-material';
-import { PriceRecord } from '@/app/types/StockSocket';
 
 type Props = {
 	priceData: {
