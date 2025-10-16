@@ -9,7 +9,6 @@ type Props = {
 
 const Card = ({ stockHistory }: Props) => {
 	const { stockPrices } = useStockContext();
-	console.log({ stockPrices });
 	const currentPrice = stockPrices[stockHistory.stock.symbol] || 0;
 	const previousPrice = stockPrices[`${stockHistory.stock.symbol}-prev`] || 0;
 	const isDownward = currentPrice < previousPrice;
@@ -19,8 +18,13 @@ const Card = ({ stockHistory }: Props) => {
 		symbol +
 		(previousPrice ? (difference / previousPrice) * 100 : 0).toFixed(8) +
 		'%';
+	const isValueBelowAlert = currentPrice < stockHistory.alertPrice;
 	return (
-		<CardContainer>
+		<CardContainer
+			style={{
+				border: isValueBelowAlert ? '2px solid red' : '2px solid green',
+			}}
+		>
 			<CardHeader>
 				<h2>{stockHistory.stock.symbol}</h2>
 				<p>{stockPrices[stockHistory.stock.symbol] || 0}</p>

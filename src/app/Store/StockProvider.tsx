@@ -52,7 +52,7 @@ const fetchStocks = async (): Promise<IStock[]> => {
 	return data;
 };
 
-const initialStocks: IStock[] = [
+const testStock: IStock[] = [
 	{
 		symbol: 'BINANCE:BTCUSDT',
 		currency: 'USD',
@@ -77,6 +77,21 @@ const initialStocks: IStock[] = [
 		isin: null,
 		symbol2: 'SPX500',
 	},
+];
+
+const principalStocks = [
+	'MSFT',
+	'AAPL',
+	'GOOGL',
+	'AMZN',
+	'TSLA',
+	'META',
+	'NVDA',
+	'GBP',
+	'GBP/USD',
+	'EUR/USD',
+	'BTC-USD',
+	'ETH-USD',
 ];
 
 const StockProvider = ({ children }: Props) => {
@@ -104,7 +119,13 @@ const StockProvider = ({ children }: Props) => {
 				return;
 			}
 			const stocksFromApi = await fetchStocks();
-			const stocks = [...initialStocks, ...stocksFromApi.slice(0, 100)];
+			// Filter principal stocks
+			const filteredStocks = stocksFromApi.filter(
+				(stock) =>
+					principalStocks.includes(stock.symbol2) ||
+					principalStocks.includes(stock.symbol)
+			);
+			const stocks = [...filteredStocks, ...stocksFromApi.slice(0, 50)];
 			setStocks(stocks);
 			localStorage.setItem('stocks', JSON.stringify(stocks));
 		};
