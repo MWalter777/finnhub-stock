@@ -12,7 +12,8 @@ export default function useStockSocket(
 	PriceRecord,
 	StockHistory[],
 	(history: StockHistory) => void,
-	unsubscribeStock: (symbol: string) => void
+	(symbol: string) => void,
+	() => void
 ] {
 	const [prices, setPrices] = useState<PriceRecord>({});
 	const [history, setHistory] = useState<StockHistory[]>([]);
@@ -21,6 +22,34 @@ export default function useStockSocket(
 		console.log('Saving stock history to localStorage:', data);
 		if (typeof window !== 'undefined' && data.length > 0) {
 			localStorage.setItem('stockHistory', JSON.stringify(data));
+		}
+	};
+
+	const loadFromLocalStorage = () => {
+		if (typeof window !== 'undefined') {
+			const storedData = localStorage.getItem('stockHistory');
+			if (storedData) {
+				try {
+					const parsedData = JSON.parse(storedData) as StockHistory[];
+					setHistory(parsedData);
+					const initialPrices: PriceRecord = {};
+					parsedData.forEach((h) => {
+						if (h.prices.length > 0) {
+							const lastPricePoint = h.prices[h.prices.length - 1];
+							initialPrices[h.stock.symbol] = {
+								price: lastPricePoint.price,
+								prevPrice: lastPricePoint.prevPrice,
+							};
+						}
+					});
+					setPrices(initialPrices);
+				} catch (error) {
+					console.error(
+						'Error parsing stock history from localStorage:',
+						error
+					);
+				}
+			}
 		}
 	};
 
@@ -111,5 +140,11 @@ export default function useStockSocket(
 		});
 	};
 
-	return [prices, history, subscribeNewStock, unsubscribeStock];
+	return [
+		prices,
+		history,
+		subscribeNewStock,
+		unsubscribeStock,
+		loadFromLocalStorage,
+	];
 }

@@ -43,8 +43,13 @@ type Props = {
 
 const StockProvider = ({ children }: Props) => {
 	const [stocks, setStocks] = useState<IStock[]>([]);
-	const [stockPrices, stockHistory, subscribeNewStock, unsubscribeStock] =
-		useStockSocket([]);
+	const [
+		stockPrices,
+		stockHistory,
+		subscribeNewStock,
+		unsubscribeStock,
+		loadFromLocalStorage,
+	] = useStockSocket([]);
 
 	const updateHistoricalStock = async (stock: IStock, alertPrice: number) => {
 		const initialData = await getInitialValueBySymbol(stock.symbol);
@@ -83,6 +88,7 @@ const StockProvider = ({ children }: Props) => {
 	useEffect(() => {
 		const getStocks = async () => {
 			const stocksFromLocalStorage = localStorage.getItem('stocks');
+			loadFromLocalStorage();
 			if (stocksFromLocalStorage) {
 				const currentStocks = JSON.parse(stocksFromLocalStorage) as IStock[];
 				setStocks(currentStocks);
