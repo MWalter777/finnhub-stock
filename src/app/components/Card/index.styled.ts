@@ -17,3 +17,15 @@ export const CardHeader = styled.div`
 	justify-content: space-between;
 	align-items: center;
 `;
+
+interface H2Props {
+	isdownward?: string | number | boolean;
+}
+
+export const H2 = styled.h2<H2Props>`
+	font-size: 1.5rem;
+	font-weight: 600;
+	color: #333333;
+	margin: 0;
+	color: ${(props) => (props.isdownward ? 'red' : 'green')};
+`;

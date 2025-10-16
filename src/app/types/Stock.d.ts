@@ -10,3 +10,11 @@ export interface IStock {
 	symbol2: string;
 	type: string;
 }
+
+export interface StreamStockPrice {
+	c?: string;
+	p: number;
+	s: string;
+	t: number;
+	v: number;
+}

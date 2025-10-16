@@ -6,6 +6,7 @@ import React, {
 	useState,
 } from 'react';
 import { IStock } from '../types/Stock';
+import useStockSocket from '../hook/useStockSocket';
 
 export type StockPricePoint = {
 	timestamp: number;
@@ -21,6 +22,7 @@ export type StockHistory = {
 type StockContext = {
 	stocks: IStock[];
 	stockHistory: StockHistory[];
+	stockPrices: Record<string, number>;
 };
 
 type StockActionContext = {
@@ -32,6 +34,7 @@ type StockFullContext = StockContext & StockActionContext;
 const defaultState: StockFullContext = {
 	stocks: [],
 	stockHistory: [],
+	stockPrices: {},
 	addStockHistory: () => {},
 };
 
@@ -49,39 +52,47 @@ const fetchStocks = async (): Promise<IStock[]> => {
 	return data;
 };
 
+const initialStocks: IStock[] = [
+	{
+		symbol: 'BINANCE:BTCUSDT',
+		currency: 'USD',
+		description: 'Bitcoin US Dollar',
+		displaySymbol: 'BTCUSDT',
+		type: 'crypto',
+		mic: 'BINANCE',
+		figi: 'BBG001S5N8V8',
+		shareClassFIGI: '',
+		isin: null,
+		symbol2: 'BTCUSDT',
+	},
+	{
+		symbol: 'IC MARKETS:1',
+		currency: 'USD',
+		description: 'S&P 500',
+		displaySymbol: 'SPX500',
+		type: 'index',
+		mic: 'IC MARKETS',
+		figi: 'BBG001S5N8V8',
+		shareClassFIGI: '',
+		isin: null,
+		symbol2: 'SPX500',
+	},
+];
+
 const StockProvider = ({ children }: Props) => {
 	const [stocks, setStocks] = useState<IStock[]>([]);
 	const [historicalStocks, setHistoricalStocks] = useState<StockHistory[]>([]);
+	const [stockPrices, stockHistory, subscribeNewStock] =
+		useStockSocket(historicalStocks);
 
 	const updateHistoricalStock = (stock: IStock, alertPrice: number) => {
 		const newStock: StockHistory = {
 			stock,
 			alertPrice,
-			prices: [
-				{
-					timestamp: new Date(Date.now() - 5000).getTime(),
-					price: Math.random() * 1510,
-				},
-				{
-					timestamp: new Date(Date.now() - 7000).getTime(),
-					price: Math.random() * 1510,
-				},
-				{
-					timestamp: new Date(Date.now() - 8000).getTime(),
-					price: Math.random() * 1510,
-				},
-				{
-					timestamp: new Date(Date.now() - 9000).getTime(),
-					price: Math.random() * 1510,
-				},
-				{
-					timestamp: new Date(Date.now() - 15000).getTime(),
-					price: Math.random() * 1510,
-				},
-			],
+			prices: [],
 		};
-		console.log(newStock);
 		setHistoricalStocks((prev) => [...prev, newStock]);
+		subscribeNewStock(newStock);
 	};
 
 	useEffect(() => {
@@ -93,7 +104,7 @@ const StockProvider = ({ children }: Props) => {
 				return;
 			}
 			const stocksFromApi = await fetchStocks();
-			const stocks = stocksFromApi.slice(0, 1000);
+			const stocks = [...initialStocks, ...stocksFromApi.slice(0, 100)];
 			setStocks(stocks);
 			localStorage.setItem('stocks', JSON.stringify(stocks));
 		};
@@ -104,7 +115,8 @@ const StockProvider = ({ children }: Props) => {
 		<stockContext.Provider
 			value={{
 				stocks,
-				stockHistory: historicalStocks,
+				stockHistory: stockHistory,
+				stockPrices,
 				addStockHistory: updateHistoricalStock,
 			}}
 		>
