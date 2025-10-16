@@ -88,6 +88,7 @@ const GraphStocks = () => {
 									stroke={getColor(i)}
 									strokeWidth={2}
 									dot={false}
+									isAnimationActive={false}
 								/>
 							);
 						})}

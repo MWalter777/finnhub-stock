@@ -3,6 +3,7 @@ import { FormSection } from './index.styled';
 import { Autocomplete, Button, TextField } from '@mui/material';
 import { IStock } from '@/app/types/Stock';
 import { useStockContext } from '@/app/Store/StockProvider';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 
 type FormState = {
 	stock: IStock | null;
@@ -10,89 +11,86 @@ type FormState = {
 };
 
 const StockToWatchForm = () => {
-	const autoCompletRef = useRef<any>(null);
-	const alertPriceRef = useRef<any>(null);
-	const { stocks, addStockHistory } = useStockContext();
-	const [historicalStock, setHistoricalStock] = useState<FormState>({
-		alertPrice: null,
-		stock: null,
+	const {
+		register,
+		control,
+		reset,
+		handleSubmit,
+		formState: { errors },
+	} = useForm<FormState>({
+		defaultValues: {
+			stock: null,
+			alertPrice: null,
+		},
 	});
+	const { stocks, addStockHistory } = useStockContext();
 
-	const handleStockChange = (_: any, value: IStock | null) => {
-		if (value) {
-			setHistoricalStock((prev) => ({
-				...prev,
-				stock: value,
-			}));
+	const onSubmit: SubmitHandler<FormState> = (data) => {
+		if (data.stock && data.alertPrice !== null) {
+			addStockHistory(data.stock, data.alertPrice);
 		}
-	};
-
-	const handleAlertPrice = ({
-		target: { value },
-	}: {
-		target: { value: string };
-	}) => {
-		if (value) {
-			const alertPriceValue = parseInt(value);
-			if (!isNaN(alertPriceValue)) {
-				setHistoricalStock((prev) => ({
-					...prev,
-					alertPrice: alertPriceValue,
-				}));
-			}
-		}
-	};
-
-	const addStock = () => {
-		if (historicalStock?.stock && historicalStock?.alertPrice) {
-			addStockHistory(historicalStock.stock, historicalStock.alertPrice);
-			setHistoricalStock({
-				alertPrice: 0,
-				stock: null,
-			});
-			if (alertPriceRef.current && autoCompletRef.current) {
-				alertPriceRef.current.value = '';
-				autoCompletRef.current.value = '';
-			}
-			console.log({ alertPriceRef, autoCompletRef });
-		}
+		reset({
+			stock: null,
+			alertPrice: null,
+		});
 	};
 
 	return (
-		<FormSection>
-			<Autocomplete
-				disablePortal
-				options={stocks}
-				getOptionLabel={(option) => option.symbol}
-				isOptionEqualToValue={(option, value) => option.symbol === value.symbol}
-				className='w-full'
-				id='stock-selected'
-				onChange={handleStockChange}
-				renderInput={(params) => (
-					<TextField
-						inputRef={autoCompletRef}
-						{...params}
-						label='Select a stock'
-						variant='standard'
+		<FormSection onSubmit={handleSubmit(onSubmit)}>
+			<Controller
+				name='stock'
+				control={control}
+				rules={{ required: 'Please select a stock' }}
+				render={({ field, fieldState }) => (
+					<Autocomplete
+						disablePortal
+						options={stocks}
+						getOptionLabel={(option) => option.symbol}
+						isOptionEqualToValue={(option, value) =>
+							option.symbol === value.symbol
+						}
+						className='w-full'
+						value={field.value}
+						onChange={(_, newValue) => field.onChange(newValue)}
+						renderInput={(params) => (
+							<TextField
+								{...params}
+								error={!!fieldState.error}
+								helperText={fieldState.error?.message}
+								label='Select a stock'
+								variant='standard'
+							/>
+						)}
 					/>
 				)}
 			/>
 			<TextField
-				id='price-alert'
-				name='price-alert'
+				id='alertPrice'
 				label='Price alert'
 				variant='standard'
 				type='number'
+				error={!!errors.alertPrice}
+				helperText={errors.alertPrice?.message}
+				slotProps={{
+					input: {
+						// @ts-ignore
+						inputProps: {
+							step: 'any',
+						},
+					},
+				}}
+				inputMode='decimal'
 				className='w-full mt-4'
-				inputRef={alertPriceRef}
-				onChange={handleAlertPrice}
+				{...register('alertPrice', {
+					valueAsNumber: true,
+					required: 'Price is required',
+					min: {
+						value: 0.0,
+						message: 'Price must be greater or equal than 0',
+					},
+				})}
 			/>
-			<Button
-				onClick={addStock}
-				type='button'
-				variant='contained'
-				className='w-full'
-			>
+			<Button type='submit' variant='contained' className='w-full'>
 				Add stock
 			</Button>
 		</FormSection>
