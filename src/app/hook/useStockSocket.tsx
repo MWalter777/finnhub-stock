@@ -1,15 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
-import { IStock, StreamStockPrice } from '../types/Stock';
+import { StreamStockPrice } from '../types/Stock';
 import { StockHistory, StockPricePoint } from '../Store/StockProvider';
+import { PriceRecord } from '../types/StockSocket';
 
 const API_KEY = process.env.NEXT_PUBLIC_FINNHUB_API_KEY;
 const SOCKET_URL = `wss://ws.finnhub.io?token=${API_KEY}`;
 
 export default function useStockSocket(
 	stockList: StockHistory[]
-): [Record<string, number>, StockHistory[], (history: StockHistory) => void] {
-	const [prices, setPrices] = useState<Record<string, number>>({});
-	const prevPrices = useRef<Record<string, number>>({});
+): [PriceRecord, StockHistory[], (history: StockHistory) => void] {
+	const [prices, setPrices] = useState<PriceRecord>({});
 	const [history, setHistory] = useState<StockHistory[]>([]);
 
 	useEffect(() => {
@@ -30,12 +30,13 @@ export default function useStockSocket(
 				data: StreamStockPrice[];
 			};
 			if (data.type === 'trade' && data.data && Array.isArray(data.data)) {
-				const latestPrices: Record<string, number> = {};
+				const latestPrices: PriceRecord = {};
 				data.data.forEach((trade: StreamStockPrice) => {
-					const prevPrice = prevPrices.current[trade.s] ?? trade.p;
-					latestPrices[`${trade.s}-prev`] = prevPrice;
-					latestPrices[trade.s] = trade.p;
-					prevPrices.current[trade.s] = trade.p;
+					const prevPrice = prices[trade.s]?.price ?? trade.p;
+					latestPrices[trade.s] = {
+						price: trade.p,
+						prevPrice: prevPrice,
+					};
 					setHistory((prevHist: any[]) => {
 						const stockHist: StockHistory = prevHist.find(
 							(h) => h.stock.symbol === trade.s
@@ -78,7 +79,10 @@ export default function useStockSocket(
 				: 0;
 		setPrices((prev) => ({
 			...prev,
-			[historicalStock.stock.symbol]: currentPrice,
+			[historicalStock.stock.symbol]: {
+				price: currentPrice,
+				prevPrice: currentPrice,
+			},
 		}));
 		console.log('new subscription', historicalStock);
 	};

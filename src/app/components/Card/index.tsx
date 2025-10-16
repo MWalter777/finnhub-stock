@@ -9,16 +9,22 @@ type Props = {
 
 const Card = ({ stockHistory }: Props) => {
 	const { stockPrices } = useStockContext();
-	const currentPrice = stockPrices[stockHistory.stock.symbol] || 0;
-	const previousPrice = stockPrices[`${stockHistory.stock.symbol}-prev`] || 0;
-	const isDownward = currentPrice < previousPrice;
+	const priceData = stockPrices[stockHistory.stock.symbol] || {
+		price: 0,
+		prevPrice: 0,
+	};
+	const isDownward = priceData.price < priceData.prevPrice;
 	const symbol = isDownward ? '-' : '+';
-	const difference = Math.abs(currentPrice - previousPrice);
+	const difference = Math.abs(priceData.price - priceData.prevPrice);
 	const percentageChange =
 		symbol +
-		(previousPrice ? (difference / previousPrice) * 100 : 0).toFixed(8) +
+		(priceData.prevPrice
+			? (difference / priceData.prevPrice) * 100
+			: 0
+		).toFixed(8) +
 		'%';
-	const isValueBelowAlert = currentPrice < stockHistory.alertPrice;
+	const isValueBelowAlert = priceData.prevPrice < stockHistory.alertPrice;
+	console.log({ priceData, stockHistory });
 	return (
 		<CardContainer
 			style={{
@@ -27,7 +33,7 @@ const Card = ({ stockHistory }: Props) => {
 		>
 			<CardHeader>
 				<h2>{stockHistory.stock.symbol}</h2>
-				<p>{stockPrices[stockHistory.stock.symbol] || 0}</p>
+				<p>{stockPrices[stockHistory.stock.symbol]?.price || 0}</p>
 			</CardHeader>
 			<div className='flex gap-4'>
 				<H2 isdownward={isDownward ? 1 : 0}>

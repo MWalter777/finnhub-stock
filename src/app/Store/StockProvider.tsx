@@ -11,6 +11,7 @@ import {
 	getInitialValueBySymbol,
 	getStockSymbols,
 } from '../utils/getStockSymbols';
+import { PriceRecord } from '../types/StockSocket';
 
 export type StockPricePoint = {
 	timestamp: number;
@@ -27,7 +28,7 @@ export type StockHistory = {
 type StockContext = {
 	stocks: IStock[];
 	stockHistory: StockHistory[];
-	stockPrices: Record<string, number>;
+	stockPrices: PriceRecord;
 };
 
 type StockActionContext = {
