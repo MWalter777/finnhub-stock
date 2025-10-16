@@ -17,4 +17,8 @@ export const StockSection = styled.section`
 		flex-direction: row;
 		gap: 2rem;
 	}
+	@media (min-width: 1024px) {
+		gap: 3rem;
+		width: 85%;
+	}
 `;
