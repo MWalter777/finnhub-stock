@@ -18,3 +18,14 @@ export interface StreamStockPrice {
 	t: number;
 	v: number;
 }
+
+export interface CurrentStockPrice {
+	c: number; // Current price
+	d: number;
+	dp: number;
+	h: number;
+	l: number;
+	o: number;
+	pc: number; // Previous close price
+	t: number; // Timestamp
+}

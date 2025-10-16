@@ -7,10 +7,15 @@ import React, {
 } from 'react';
 import { IStock } from '../types/Stock';
 import useStockSocket from '../hook/useStockSocket';
+import {
+	getInitialValueBySymbol,
+	getStockSymbols,
+} from '../utils/getStockSymbols';
 
 export type StockPricePoint = {
 	timestamp: number;
 	price: number;
+	prevPrice: number;
 };
 
 export type StockHistory = {
@@ -26,7 +31,7 @@ type StockContext = {
 };
 
 type StockActionContext = {
-	addStockHistory: (stock: IStock, alertPrice: number) => void;
+	addStockHistory: (stock: IStock, alertPrice: number) => Promise<void>;
 };
 
 type StockFullContext = StockContext & StockActionContext;
@@ -35,7 +40,7 @@ const defaultState: StockFullContext = {
 	stocks: [],
 	stockHistory: [],
 	stockPrices: {},
-	addStockHistory: () => {},
+	addStockHistory: async () => {},
 };
 
 const stockContext = createContext<StockFullContext>(defaultState);
@@ -44,67 +49,28 @@ type Props = {
 	children: ReactElement | ReactElement[];
 };
 
-const url = `https://finnhub.io/api/v1/stock/symbol?exchange=US&token=${process.env.NEXT_PUBLIC_FINNHUB_API_KEY}`;
-
-const fetchStocks = async (): Promise<IStock[]> => {
-	const response = await fetch(url);
-	const data = await response.json();
-	return data;
-};
-
-const testStock: IStock[] = [
-	{
-		symbol: 'BINANCE:BTCUSDT',
-		currency: 'USD',
-		description: 'Bitcoin US Dollar',
-		displaySymbol: 'BTCUSDT',
-		type: 'crypto',
-		mic: 'BINANCE',
-		figi: 'BBG001S5N8V8',
-		shareClassFIGI: '',
-		isin: null,
-		symbol2: 'BTCUSDT',
-	},
-	{
-		symbol: 'IC MARKETS:1',
-		currency: 'USD',
-		description: 'S&P 500',
-		displaySymbol: 'SPX500',
-		type: 'index',
-		mic: 'IC MARKETS',
-		figi: 'BBG001S5N8V8',
-		shareClassFIGI: '',
-		isin: null,
-		symbol2: 'SPX500',
-	},
-];
-
-const principalStocks = [
-	'MSFT',
-	'AAPL',
-	'GOOGL',
-	'AMZN',
-	'TSLA',
-	'META',
-	'NVDA',
-	'GBP',
-	'GBP/USD',
-	'EUR/USD',
-	'BTC-USD',
-	'ETH-USD',
-];
-
 const StockProvider = ({ children }: Props) => {
 	const [stocks, setStocks] = useState<IStock[]>([]);
 	const [historicalStocks, setHistoricalStocks] = useState<StockHistory[]>([]);
 	const [stockPrices, stockHistory, subscribeNewStock] =
 		useStockSocket(historicalStocks);
 
-	const updateHistoricalStock = (stock: IStock, alertPrice: number) => {
+	const updateHistoricalStock = async (stock: IStock, alertPrice: number) => {
+		const initialData = await getInitialValueBySymbol(stock.symbol);
+		console.log({ initialData });
+		const prices: StockPricePoint[] = initialData?.c
+			? [
+					{
+						timestamp: initialData.t,
+						price: initialData.c,
+						prevPrice: initialData.pc,
+					},
+			  ]
+			: [];
 		const newStock: StockHistory = {
 			stock,
 			alertPrice,
-			prices: [],
+			prices,
 		};
 		setHistoricalStocks((prev) => [...prev, newStock]);
 		subscribeNewStock(newStock);
@@ -118,14 +84,7 @@ const StockProvider = ({ children }: Props) => {
 				setStocks(currentStocks);
 				return;
 			}
-			const stocksFromApi = await fetchStocks();
-			// Filter principal stocks
-			const filteredStocks = stocksFromApi.filter(
-				(stock) =>
-					principalStocks.includes(stock.symbol2) ||
-					principalStocks.includes(stock.symbol)
-			);
-			const stocks = [...filteredStocks, ...stocksFromApi.slice(0, 50)];
+			const stocks = await getStockSymbols();
 			setStocks(stocks);
 			localStorage.setItem('stocks', JSON.stringify(stocks));
 		};

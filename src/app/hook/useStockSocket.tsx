@@ -43,6 +43,7 @@ export default function useStockSocket(
 						const pricePoint: StockPricePoint = {
 							timestamp: trade.t,
 							price: trade.p,
+							prevPrice: prevPrice,
 						};
 						if (stockHist) {
 							stockHist.prices.push(pricePoint);
@@ -71,7 +72,14 @@ export default function useStockSocket(
 
 	const subscribeNewStock = (historicalStock: StockHistory) => {
 		setHistory((prev) => [...prev, historicalStock]);
-		setPrices((prev) => ({ ...prev, [historicalStock.stock.symbol]: 0 }));
+		const currentPrice =
+			historicalStock.prices.length > 0
+				? historicalStock.prices[historicalStock.prices.length - 1].price
+				: 0;
+		setPrices((prev) => ({
+			...prev,
+			[historicalStock.stock.symbol]: currentPrice,
+		}));
 		console.log('new subscription', historicalStock);
 	};
 
