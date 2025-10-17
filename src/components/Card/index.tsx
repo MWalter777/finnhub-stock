@@ -4,9 +4,11 @@ import { useStockContext } from '@/Store/StockProvider';
 import { StockHistory } from '@/types/StockProvider';
 import CloseIcon from '@mui/icons-material/Close';
 import BodyCard from './BodyCard';
+import { getColor } from '@/utils/colors';
 
 type Props = {
 	stockHistory: StockHistory;
+	index: number;
 };
 
 const getPrices = (stockHistory?: StockHistory) => {
@@ -30,7 +32,7 @@ const getPrices = (stockHistory?: StockHistory) => {
 	};
 };
 
-const Card = ({ stockHistory }: Props) => {
+const Card = ({ stockHistory, index }: Props) => {
 	const { removeStock } = useStockContext();
 	const priceData = getPrices(stockHistory);
 	const isValueBelowAlert = priceData.prevPrice < stockHistory.alertPrice;
@@ -47,7 +49,13 @@ const Card = ({ stockHistory }: Props) => {
 				<CloseIcon />
 			</button>
 			<CardHeader>
-				<h2>{stockHistory.stock.symbol}</h2>
+				<h2
+					style={{
+						color: getColor(index),
+					}}
+				>
+					{stockHistory.stock.symbol}
+				</h2>
 				<p>$ {priceData.price}</p>
 			</CardHeader>
 			<BodyCard priceData={priceData} />

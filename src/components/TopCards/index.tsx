@@ -20,8 +20,8 @@ const TopCards = () => {
 				loop={true}
 			>
 				{stockHistory.map((sh, index) => (
-					<SwiperSlide key={index}>
-						<Card stockHistory={sh} />
+					<SwiperSlide key={sh.stock.symbol}>
+						<Card stockHistory={sh} index={index} />
 					</SwiperSlide>
 				))}
 			</Swiper>

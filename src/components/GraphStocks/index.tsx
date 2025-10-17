@@ -11,6 +11,7 @@ import {
 	CartesianGrid,
 } from 'recharts';
 import { ChartWrapper, Container } from './index.styled';
+import { getColor } from '@/utils/colors';
 
 function mergeHistory(history: StockHistory[]) {
 	const merged: {
@@ -40,11 +41,6 @@ function mergeHistory(history: StockHistory[]) {
 	});
 
 	return merged;
-}
-
-function getColor(i: number) {
-	const colors = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#0088FE'];
-	return colors[i % colors.length];
 }
 
 const GraphStocks = () => {

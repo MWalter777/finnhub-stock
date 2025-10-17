@@ -20,12 +20,10 @@ export default function useStockSocket(): UseStockSocketReturn {
 	const socketRef = useRef<WebSocket | null>(null);
 
 	useEffect(() => {
-		console.log('Online status changed:', isOnline);
 		if (!isOnline) {
 			if (socketRef.current) {
 				socketRef.current.close();
 				socketRef.current = null;
-				console.log('WebSocket disconnected due to offline status');
 			}
 		} else {
 			if (!socketRef.current) {
@@ -60,7 +58,7 @@ export default function useStockSocket(): UseStockSocketReturn {
 									const newPrice: StockPricePoint = {
 										prevPrice: lastPrice,
 										price: streamFirstData.p,
-										timestamp: streamFirstData.t,
+										timestamp: new Date().getTime(),
 									};
 									const updatedHistory: StockHistory = {
 										...h,
@@ -134,7 +132,6 @@ export default function useStockSocket(): UseStockSocketReturn {
 		const updatedHistory = historicalRef.current.filter(
 			(h) => h.stock.symbol !== symbol
 		);
-		console.log('removing', { updatedHistory, ref: historicalRef.current });
 		updateHistory(updatedHistory);
 		unsubscribeStockSocket(symbol);
 	};
