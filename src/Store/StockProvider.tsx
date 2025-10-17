@@ -53,7 +53,7 @@ const StockProvider = ({ children }: Props) => {
 		const prices: StockPricePoint[] = initialData?.c
 			? [
 					{
-						timestamp: initialData.t,
+						timestamp: new Date().getTime(),
 						price: initialData.c,
 						prevPrice: initialData.pc,
 					},

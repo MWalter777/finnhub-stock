@@ -5,7 +5,13 @@ export const Container = styled.section`
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 1rem;
+	gap: 3rem;
+	@media (min-width: 1280px) {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 2rem;
+		padding: 2rem;
+	}
 `;
 
 export const ChartWrapper = styled.div`
