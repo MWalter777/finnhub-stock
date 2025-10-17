@@ -33,10 +33,6 @@ const getPrices = (stockHistory?: StockHistory) => {
 const Card = ({ stockHistory }: Props) => {
 	const { removeStock } = useStockContext();
 	const priceData = getPrices(stockHistory);
-	console.log({
-		priceData,
-		stockHistory,
-	});
 	const isValueBelowAlert = priceData.prevPrice < stockHistory.alertPrice;
 	return (
 		<CardContainer

@@ -6,7 +6,7 @@ import { useOnlineStatus } from './useOnlineStatus';
 import { UseStockSocketReturn } from '@/types/UseStockSocket';
 import {
 	getStocksSavedInLocalStorage,
-	saveInLocalStorage,
+	saveLastestHistoricalData,
 } from '@/utils/localStorageHandle';
 
 const API_KEY = process.env.NEXT_PUBLIC_FINNHUB_API_KEY;
@@ -14,7 +14,6 @@ const SOCKET_URL = `wss://ws.finnhub.io?token=${API_KEY}`;
 
 export default function useStockSocket(): UseStockSocketReturn {
 	const { isOnline } = useOnlineStatus();
-	const isIntialConnectionDone = useRef<boolean>(false);
 	const [history, setHistory] = useState<StockHistory[]>([]);
 	const historicalRef = useRef<StockHistory[]>([]);
 	const subscribedSymbolsRef = useRef<Set<string>>(new Set());
@@ -32,19 +31,16 @@ export default function useStockSocket(): UseStockSocketReturn {
 			if (!socketRef.current) {
 				socketRef.current = new WebSocket(SOCKET_URL);
 				socketRef.current.onopen = () => {
-					if (!isIntialConnectionDone.current) {
-						const storedData = getStocksSavedInLocalStorage();
-						storedData.forEach((h) => {
-							subscribedSymbolsRef.current.add(h.stock.symbol);
-							socketRef.current?.send(
-								JSON.stringify({
-									type: 'subscribe',
-									symbol: h.stock.symbol,
-								})
-							);
-						});
-						isIntialConnectionDone.current = true;
-					}
+					const storedData = getStocksSavedInLocalStorage();
+					storedData.forEach((h) => {
+						subscribedSymbolsRef.current.add(h.stock.symbol);
+						socketRef.current?.send(
+							JSON.stringify({
+								type: 'subscribe',
+								symbol: h.stock.symbol,
+							})
+						);
+					});
 				};
 
 				socketRef.current.onmessage = (event) => {
@@ -52,11 +48,10 @@ export default function useStockSocket(): UseStockSocketReturn {
 						type: string;
 						data: StreamStockPrice[];
 					};
-					console.log({ onmessage: data });
 					if (data.type === 'trade' && data.data && Array.isArray(data.data)) {
 						const streamFirstData: StreamStockPrice = data.data[0];
 						if (streamFirstData && streamFirstData.s) {
-							historicalRef.current = historicalRef.current.map((h) => {
+							const currentHistoricalData = historicalRef.current.map((h) => {
 								if (h.stock.symbol == streamFirstData.s) {
 									const prices = h.prices;
 									const lastPrice = h.prices?.length
@@ -75,7 +70,7 @@ export default function useStockSocket(): UseStockSocketReturn {
 								}
 								return h;
 							});
-							setHistory(historicalRef.current);
+							updateHistory(currentHistoricalData);
 						}
 					}
 				};
@@ -105,16 +100,14 @@ export default function useStockSocket(): UseStockSocketReturn {
 
 	const updateHistory = (updatedHistory: StockHistory[]) => {
 		historicalRef.current = updatedHistory;
-		setHistory(historicalRef.current);
-		saveInLocalStorage(updatedHistory, 'stockHistory');
+		setHistory(updatedHistory);
+		saveLastestHistoricalData(updatedHistory);
 	};
 
 	const subscribeStockToSocket = (symbol: string) => {
 		if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
 			if (!subscribedSymbolsRef.current.has(symbol)) {
 				subscribedSymbolsRef.current.add(symbol);
-				console.log('Subscribing to stock:', symbol);
-				console.log('Currently subscribed stocks:', socketRef.current);
 				socketRef.current.send(
 					JSON.stringify({
 						type: 'subscribe',
@@ -130,7 +123,6 @@ export default function useStockSocket(): UseStockSocketReturn {
 			socketRef.current.send(JSON.stringify({ type: 'unsubscribe', symbol }));
 		}
 		subscribedSymbolsRef.current.delete(symbol);
-		console.log(`Unsuscribing ${symbol}`);
 	};
 
 	const subscribeNewStock = (historicalStock: StockHistory) => {
@@ -142,6 +134,7 @@ export default function useStockSocket(): UseStockSocketReturn {
 		const updatedHistory = historicalRef.current.filter(
 			(h) => h.stock.symbol !== symbol
 		);
+		console.log('removing', { updatedHistory, ref: historicalRef.current });
 		updateHistory(updatedHistory);
 		unsubscribeStockSocket(symbol);
 	};
