@@ -91,7 +91,6 @@ export default function useStockSocket(): UseStockSocketReturn {
 			if (socketRef.current) {
 				socketRef.current.close();
 				socketRef.current = null;
-				console.log('WebSocket disconnected on cleanup');
 			}
 		};
 	}, [isOnline]);

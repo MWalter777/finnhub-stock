@@ -92,7 +92,6 @@ self.addEventListener('push', (event) => {
  * this is just for testing purposes
  */
 self.addEventListener('message', (event) => {
-	console.log('message event received:', event);
 	const data = JSON.parse(event?.data?.payload || '{}') || {};
 	const title = data.title || 'Finnhub';
 	const body = data.body || 'No data';
