@@ -8,6 +8,7 @@ import {
 	getStocksSavedInLocalStorage,
 	saveLastestHistoricalData,
 } from '@/utils/localStorageHandle';
+import useShowNotification from './useShowNotification';
 
 const API_KEY = process.env.NEXT_PUBLIC_FINNHUB_API_KEY;
 const SOCKET_URL = `wss://ws.finnhub.io?token=${API_KEY}`;
@@ -25,6 +26,8 @@ export default function useStockSocket(): UseStockSocketReturn {
 	const historicalRef = useRef<StockHistory[]>([]);
 	const subscribedSymbolsRef = useRef<Set<string>>(new Set());
 	const socketRef = useRef<WebSocket | null>(null);
+	// push notification
+	const { sendCustomNotification } = useShowNotification();
 
 	useEffect(() => {
 		if (!isOnline) {
@@ -67,6 +70,8 @@ export default function useStockSocket(): UseStockSocketReturn {
 										price: streamFirstData.p,
 										timestamp: new Date().getTime(),
 									};
+									// send notification
+									sendCustomNotification(h.stock.symbol, newPrice);
 									const updatedHistory: StockHistory = {
 										...h,
 										prices: [...prices, newPrice],
