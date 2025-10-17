@@ -7,10 +7,6 @@ import { useStockContext } from '@/Store/StockProvider';
 
 const TopCards = () => {
 	const { stockHistory } = useStockContext();
-	const onSlideChange = (swiper: any) => {
-		console.log('slide change', swiper);
-	};
-
 	return (
 		<TopCardSection>
 			<Swiper
@@ -22,8 +18,7 @@ const TopCards = () => {
 				}}
 				grabCursor={true}
 				loop={true}
-				autoplay={{ delay: 3000 }}
-				onSwiper={onSlideChange}
+				autoplay={true}
 			>
 				{stockHistory.map((sh, index) => (
 					<SwiperSlide key={sh.stock.symbol}>
