@@ -25,6 +25,12 @@ const principalStocks = [
 ];
 
 export const getStockSymbols = async (): Promise<IStock[]> => {
+	// verify if the data is in local storage
+	const localData = localStorage.getItem('stockSymbols');
+	if (localData) {
+		return JSON.parse(localData) as IStock[];
+	}
+
 	const stocksFromApi = await fetchStocks<IStock[]>(FINNHUB_URLS.stockSymbols);
 	// Filter principal stocks
 	const filteredStocks = stocksFromApi.filter(
@@ -33,6 +39,7 @@ export const getStockSymbols = async (): Promise<IStock[]> => {
 			principalStocks.includes(stock.symbol)
 	);
 	const stocks = [...filteredStocks, ...stocksFromApi.slice(0, 50)];
+	localStorage.setItem('stockSymbols', JSON.stringify(stocks));
 	return stocks;
 };
 
