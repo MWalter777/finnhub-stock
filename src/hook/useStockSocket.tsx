@@ -2,6 +2,7 @@ import { RefObject, useEffect, useRef, useState } from 'react';
 import { StreamStockPrice } from '../types/Stock';
 import { PriceRecord } from '../types/StockSocket';
 import { StockHistory, StockPricePoint } from '../types/StockProvider';
+import { useOnlineStatus } from './useOnlineStatus';
 
 const API_KEY = process.env.NEXT_PUBLIC_FINNHUB_API_KEY;
 const SOCKET_URL = `wss://ws.finnhub.io?token=${API_KEY}`;
@@ -15,8 +16,10 @@ export default function useStockSocket(
 	(symbol: string) => void,
 	() => StockHistory[]
 ] {
+	const { isOnline } = useOnlineStatus();
 	const [prices, setPrices] = useState<PriceRecord>({});
 	const [history, setHistory] = useState<StockHistory[]>([]);
+	console.log('Online status:', isOnline);
 
 	const saveInLocalStorage = (data: StockHistory[]) => {
 		if (typeof window !== 'undefined' && data.length > 0) {
@@ -104,7 +107,6 @@ export default function useStockSocket(
 
 		return () => {
 			socket.close();
-			console.log('WebSocket disconnected');
 		};
 	}, [stockList]);
 
