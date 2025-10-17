@@ -1,11 +1,6 @@
 import { StockHistory } from '@/types/StockProvider';
 import React from 'react';
-import { Container } from './index.styled';
-import {
-	getColor,
-	mergeAllDataHistory,
-	mergeHistory,
-} from '@/utils/graphUtils';
+import { getColor, mergeAllDataHistory } from '@/utils/graphUtils';
 import {
 	CartesianGrid,
 	Line,

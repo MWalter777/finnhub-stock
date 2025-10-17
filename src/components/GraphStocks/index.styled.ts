@@ -6,6 +6,7 @@ export const Container = styled.section`
 	flex-direction: column;
 	align-items: center;
 	gap: 3rem;
+	padding: 1rem;
 	@media (min-width: 1280px) {
 		display: grid;
 		grid-template-columns: repeat(2, 1fr);
@@ -15,6 +16,6 @@ export const Container = styled.section`
 `;
 
 export const ChartWrapper = styled.div`
-	width: 90%;
+	width: 100%;
 	height: 300px;
 `;

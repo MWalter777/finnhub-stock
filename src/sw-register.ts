@@ -1,3 +1,6 @@
+/**
+ * Registers the service worker to enable PWA capabilities.
+ */
 if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
 	window.addEventListener('load', () => {
 		navigator.serviceWorker

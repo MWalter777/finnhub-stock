@@ -1,10 +1,19 @@
 import { StockHistory } from '@/types/StockProvider';
-
+/**
+ *
+ * @param i: index to get the color
+ * @returns a color from the predefined list
+ */
 export const getColor = (i: number) => {
 	const colors = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#0088FE'];
 	return colors[i % colors.length];
 };
 
+/**
+ *
+ * @param history: stock history data
+ * @returns merged stock history for graphing
+ */
 export function mergeHistory(history: StockHistory) {
 	const merged: {
 		[x: string]: number | null;
@@ -31,6 +40,11 @@ export function mergeHistory(history: StockHistory) {
 	return merged;
 }
 
+/**
+ *
+ * @param history: array of stock histories
+ * @returns merged stock histories for graphing
+ */
 export function mergeAllDataHistory(history: StockHistory[]) {
 	const merged: {
 		[x: string]: number | null;

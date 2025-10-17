@@ -118,12 +118,20 @@ export const lOCAL_STORE_ITEMS = {
 	stockHistory: 'stockHistory',
 };
 
+/**
+ * Saves data in local storage under the specified item name.
+ * @param data - The data to be saved.
+ * @param itemName - The key under which the data will be stored.
+ */
 export const saveInLocalStorage = <T>(data: T[], itemName: string) => {
 	if (typeof window !== 'undefined') {
 		localStorage.setItem(itemName, JSON.stringify(data));
 	}
 };
 
+/** Saves the latest historical data, keeping only the last 50 price entries for each stock.
+ * @param historicalData - The array of StockHistory objects to be saved.
+ */
 export const saveLastestHistoricalData = (historicalData: StockHistory[]) => {
 	const dataToSaved: StockHistory[] = historicalData.map((h) => {
 		const last50Prices = h.prices.filter(
@@ -137,6 +145,9 @@ export const saveLastestHistoricalData = (historicalData: StockHistory[]) => {
 	saveInLocalStorage(dataToSaved, lOCAL_STORE_ITEMS.stockHistory);
 };
 
+/** Retrieves the stock history data saved in local storage.
+ * @returns An array of StockHistory objects.
+ */
 export const getStocksSavedInLocalStorage = (): StockHistory[] => {
 	if (typeof window !== 'undefined') {
 		const storedData = localStorage.getItem(lOCAL_STORE_ITEMS.stockHistory);

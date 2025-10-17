@@ -19,7 +19,7 @@ const BodyCard = ({ priceData }: Props) => {
 			: 0
 		).toFixed(4) + '%';
 	return (
-		<div className='flex gap-4'>
+		<div className='flex gap-4 justify-between items-center'>
 			<H2 isdownward={isDownward ? 1 : 0}>
 				{isDownward ? <ArrowDownwardSharp /> : <ArrowUpwardSharp />}
 				<span>{percentageChange}</span>

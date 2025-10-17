@@ -12,6 +12,13 @@ import {
 const API_KEY = process.env.NEXT_PUBLIC_FINNHUB_API_KEY;
 const SOCKET_URL = `wss://ws.finnhub.io?token=${API_KEY}`;
 
+/**
+ * Custom hook to manage WebSocket connection for real-time stock price updates.
+ * It handles subscribing and unsubscribing to stock symbols, maintaining
+ * historical price data, and reacting to online/offline status changes.
+ * @returns An object containing the stock price history and functions to
+ * subscribe/unsubscribe to stock symbols.
+ */
 export default function useStockSocket(): UseStockSocketReturn {
 	const { isOnline } = useOnlineStatus();
 	const [history, setHistory] = useState<StockHistory[]>([]);

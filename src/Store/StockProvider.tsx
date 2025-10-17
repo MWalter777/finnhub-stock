@@ -39,7 +39,13 @@ const stockContext = createContext<StockFullContext>(defaultState);
 type Props = {
 	children: ReactElement | ReactElement[];
 };
-
+/**
+ * StockProvider component to manage stock data and provide it via context.
+ * It uses the useStockSocket hook to handle real-time stock price updates
+ * and maintains a list of available stocks and their historical data.
+ * @param children - The child components that will have access to the stock context.
+ * @returns A context provider wrapping the children components.
+ */
 const StockProvider = ({ children }: Props) => {
 	const [stocks, setStocks] = useState<IStock[]>([]);
 	const {
