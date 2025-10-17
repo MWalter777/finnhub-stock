@@ -3,6 +3,7 @@ import StockToWatchForm from '../StockToWatchForm';
 import TopCards from '../TopCards';
 import GraphStocks from '../GraphStocks';
 import { MainContainer, StockSection } from './index.styled';
+import PushNotificationManager from '../Notifications/PushNotificationManager';
 
 const MainStocks = () => {
 	return (
@@ -11,6 +12,7 @@ const MainStocks = () => {
 				<StockToWatchForm />
 				<TopCards />
 			</StockSection>
+			<PushNotificationManager />
 			<GraphStocks />
 			<section></section>
 		</MainContainer>

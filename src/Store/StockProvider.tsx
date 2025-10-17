@@ -13,11 +13,11 @@ import {
 } from '../utils/getStockSymbols';
 import { PriceRecord } from '../types/StockSocket';
 import { StockHistory, StockPricePoint } from '../types/StockProvider';
+import { getStocksSavedInLocalStorage } from '@/utils/localStorageHandle';
 
 type StockContext = {
 	stocks: IStock[];
 	stockHistory: StockHistory[];
-	stockPrices: PriceRecord;
 };
 
 type StockActionContext = {
@@ -30,7 +30,6 @@ type StockFullContext = StockContext & StockActionContext;
 const defaultState: StockFullContext = {
 	stocks: [],
 	stockHistory: [],
-	stockPrices: {},
 	addStockHistory: async () => {},
 	removeStock: () => {},
 };
@@ -40,23 +39,27 @@ const stockContext = createContext<StockFullContext>(defaultState);
 type Props = {
 	children: ReactElement | ReactElement[];
 };
-
+/**
+ * StockProvider component to manage stock data and provide it via context.
+ * It uses the useStockSocket hook to handle real-time stock price updates
+ * and maintains a list of available stocks and their historical data.
+ * @param children - The child components that will have access to the stock context.
+ * @returns A context provider wrapping the children components.
+ */
 const StockProvider = ({ children }: Props) => {
 	const [stocks, setStocks] = useState<IStock[]>([]);
-	const [
-		stockPrices,
-		stockHistory,
+	const {
+		history: stockHistory,
 		subscribeNewStock,
 		unsubscribeStock,
-		loadFromLocalStorage,
-	] = useStockSocket([]);
+	} = useStockSocket();
 
 	const updateHistoricalStock = async (stock: IStock, alertPrice: number) => {
 		const initialData = await getInitialValueBySymbol(stock.symbol);
 		const prices: StockPricePoint[] = initialData?.c
 			? [
 					{
-						timestamp: initialData.t,
+						timestamp: new Date().getTime(),
 						price: initialData.c,
 						prevPrice: initialData.pc,
 					},
@@ -73,12 +76,7 @@ const StockProvider = ({ children }: Props) => {
 	};
 
 	const removeStock = (symbol: string) => {
-		console.log('Removing stock:', symbol);
 		const stock = stockHistory.find((s) => s.stock.symbol === symbol);
-		console.log('Found stock to remove:', {
-			stock,
-			stockHistory,
-		});
 		if (!stock) return;
 		const newListStocks: IStock[] = [stock.stock, ...stocks];
 		setStocks(newListStocks);
@@ -87,14 +85,10 @@ const StockProvider = ({ children }: Props) => {
 
 	useEffect(() => {
 		const getStocks = async () => {
-			const stocksFromLocalStorage = localStorage.getItem('stocks');
-			loadFromLocalStorage();
-			if (stocksFromLocalStorage) {
-				const currentStocks = JSON.parse(stocksFromLocalStorage) as IStock[];
-				setStocks(currentStocks);
-				return;
-			}
-			const stocks = await getStockSymbols();
+			const stockSaved = getStocksSavedInLocalStorage();
+			const stocks = (await getStockSymbols()).filter(
+				(stock) => !stockSaved.find((s) => s.stock.symbol === stock.symbol)
+			);
 			setStocks(stocks);
 			localStorage.setItem('stocks', JSON.stringify(stocks));
 		};
@@ -107,7 +101,6 @@ const StockProvider = ({ children }: Props) => {
 			value={{
 				stocks,
 				stockHistory: stockHistory,
-				stockPrices,
 				addStockHistory: updateHistoricalStock,
 				removeStock,
 			}}

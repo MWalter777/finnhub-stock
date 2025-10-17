@@ -3,7 +3,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { TopCardSection } from './index.styled';
 import Card from '../Card';
 import 'swiper/css';
-import { useStockContext } from '@/app/Store/StockProvider';
+import { useStockContext } from '@/Store/StockProvider';
 
 const TopCards = () => {
 	const { stockHistory } = useStockContext();
@@ -18,10 +18,11 @@ const TopCards = () => {
 				}}
 				grabCursor={true}
 				loop={true}
+				autoplay={true}
 			>
 				{stockHistory.map((sh, index) => (
-					<SwiperSlide key={index}>
-						<Card stockHistory={sh} />
+					<SwiperSlide key={sh.stock.symbol}>
+						<Card stockHistory={sh} index={index} />
 					</SwiperSlide>
 				))}
 			</Swiper>

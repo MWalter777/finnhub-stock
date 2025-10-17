@@ -1,8 +1,8 @@
 import React from 'react';
 import { FormSection } from './index.styled';
 import { Autocomplete, Button, TextField } from '@mui/material';
-import { IStock } from '@/app/types/Stock';
-import { useStockContext } from '@/app/Store/StockProvider';
+import { IStock } from '@/types/Stock';
+import { useStockContext } from '@/Store/StockProvider';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 
 type FormState = {

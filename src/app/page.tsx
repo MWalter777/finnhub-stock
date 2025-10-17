@@ -1,7 +1,8 @@
 'use client';
+import MainStocks from '@/components/MainStocks';
+import StockProvider from '@/Store/StockProvider';
 import { Box } from '@mui/material';
-import MainStocks from './components/MainStocks';
-import StockProvider from './Store/StockProvider';
+import '../sw-register';
 
 export default function Home() {
 	return (
