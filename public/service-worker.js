@@ -35,36 +35,30 @@ self.addEventListener('fetch', (event) => {
 		return;
 
 	event.respondWith(
-		caches.match(request).then((cachedResponse) => {
-			console.log('Fetching:', request.url);
-			console.log('Cached response:', cachedResponse);
-			if (cachedResponse) {
-				return cachedResponse;
-			}
-
-			return fetch(request)
-				.then((networkResponse) => {
-					if (
-						!networkResponse ||
-						networkResponse.status !== 200 ||
-						networkResponse.type !== 'basic'
-					) {
-						return networkResponse;
-					}
-
+		fetch(request)
+			.then((networkResponse) => {
+				if (
+					networkResponse &&
+					networkResponse.status === 200 &&
+					networkResponse.type === 'basic'
+				) {
 					const responseToCache = networkResponse.clone();
 					caches.open(CACHE_NAME).then((cache) => {
 						cache.put(request, responseToCache);
 					});
+				}
+				return networkResponse;
+			})
+			.catch(async () => {
+				const cachedResponse = await caches.match(request);
+				if (cachedResponse) {
+					return cachedResponse;
+				}
 
-					return networkResponse;
-				})
-				.catch(() => {
-					return new Response(JSON.stringify({ error: 'Offline' }), {
-						status: 503,
-						headers: { 'Content-Type': 'application/json' },
-					});
+				return new Response(JSON.stringify({ error: 'Offline' }), {
+					status: 503,
+					headers: { 'Content-Type': 'application/json' },
 				});
-		})
+			})
 	);
 });

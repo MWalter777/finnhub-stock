@@ -9,12 +9,34 @@ type Props = {
 	stockHistory: StockHistory;
 };
 
-const Card = ({ stockHistory }: Props) => {
-	const { stockPrices, removeStock } = useStockContext();
-	const priceData = stockPrices[stockHistory.stock.symbol] || {
+const getPrices = (stockHistory?: StockHistory) => {
+	if (stockHistory?.prices?.length) {
+		const currentPrice = stockHistory.prices[stockHistory.prices.length - 1];
+		if (stockHistory.prices.length > 1) {
+			const previousPrice = stockHistory.prices[stockHistory.prices.length - 2];
+			return {
+				price: currentPrice.price,
+				prevPrice: previousPrice.price,
+			};
+		}
+		return {
+			price: currentPrice.price,
+			prevPrice: currentPrice.price,
+		};
+	}
+	return {
 		price: 0,
 		prevPrice: 0,
 	};
+};
+
+const Card = ({ stockHistory }: Props) => {
+	const { removeStock } = useStockContext();
+	const priceData = getPrices(stockHistory);
+	console.log({
+		priceData,
+		stockHistory,
+	});
 	const isValueBelowAlert = priceData.prevPrice < stockHistory.alertPrice;
 	return (
 		<CardContainer

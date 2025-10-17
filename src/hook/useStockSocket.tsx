@@ -1,151 +1,154 @@
-import { RefObject, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { StreamStockPrice } from '../types/Stock';
 import { PriceRecord } from '../types/StockSocket';
 import { StockHistory, StockPricePoint } from '../types/StockProvider';
 import { useOnlineStatus } from './useOnlineStatus';
+import { UseStockSocketReturn } from '@/types/UseStockSocket';
+import {
+	getStocksSavedInLocalStorage,
+	saveInLocalStorage,
+} from '@/utils/localStorageHandle';
 
 const API_KEY = process.env.NEXT_PUBLIC_FINNHUB_API_KEY;
 const SOCKET_URL = `wss://ws.finnhub.io?token=${API_KEY}`;
 
-export default function useStockSocket(
-	stockList: StockHistory[]
-): [
-	PriceRecord,
-	StockHistory[],
-	(history: StockHistory) => void,
-	(symbol: string) => void,
-	() => StockHistory[]
-] {
+export default function useStockSocket(): UseStockSocketReturn {
 	const { isOnline } = useOnlineStatus();
-	const [prices, setPrices] = useState<PriceRecord>({});
+	const isIntialConnectionDone = useRef<boolean>(false);
 	const [history, setHistory] = useState<StockHistory[]>([]);
-	console.log('Online status:', isOnline);
-
-	const saveInLocalStorage = (data: StockHistory[]) => {
-		if (typeof window !== 'undefined' && data.length > 0) {
-			localStorage.setItem('stockHistory', JSON.stringify(data));
-		}
-	};
-
-	const loadFromLocalStorage = () => {
-		if (typeof window !== 'undefined') {
-			const storedData = localStorage.getItem('stockHistory');
-			if (storedData) {
-				try {
-					const parsedData = JSON.parse(storedData) as StockHistory[];
-					setHistory(parsedData);
-					const initialPrices: PriceRecord = {};
-					parsedData.forEach((h) => {
-						if (h.prices.length > 0) {
-							const lastPricePoint = h.prices[h.prices.length - 1];
-							initialPrices[h.stock.symbol] = {
-								price: lastPricePoint.price,
-								prevPrice: lastPricePoint.prevPrice,
-							};
-						}
-					});
-					setPrices(initialPrices);
-					return parsedData;
-				} catch (error) {
-					console.error(
-						'Error parsing stock history from localStorage:',
-						error
-					);
-				}
-			}
-		}
-		return [];
-	};
+	const historicalRef = useRef<StockHistory[]>([]);
+	const subscribedSymbolsRef = useRef<Set<string>>(new Set());
+	const socketRef = useRef<WebSocket | null>(null);
 
 	useEffect(() => {
-		const socket = new WebSocket(SOCKET_URL);
-
-		socket.onopen = () => {
-			console.log('WebSocket connected');
-			stockList.forEach((h) => {
-				socket.send(
-					JSON.stringify({ type: 'subscribe', symbol: h.stock.symbol })
-				);
-			});
-		};
-
-		socket.onmessage = (event) => {
-			const data = JSON.parse(event.data) as {
-				type: string;
-				data: StreamStockPrice[];
-			};
-			if (data.type === 'trade' && data.data && Array.isArray(data.data)) {
-				const latestPrices: PriceRecord = {};
-				data.data.forEach((trade: StreamStockPrice) => {
-					const prevPrice = prices[trade.s]?.price ?? trade.p;
-					latestPrices[trade.s] = {
-						price: trade.p,
-						prevPrice: prevPrice,
-					};
-					setHistory((prevHist: StockHistory[]) => {
-						const stockHist: StockHistory | undefined = prevHist.find(
-							(h) => h.stock.symbol === trade.s
-						);
-						const pricePoint: StockPricePoint = {
-							timestamp: trade.t,
-							price: trade.p,
-							prevPrice: prevPrice,
-						};
-						if (stockHist) {
-							stockHist.prices.push(pricePoint);
-						}
-						saveInLocalStorage(prevHist);
-						return [...prevHist];
-					});
-				});
-				setPrices((prev) => ({
-					...prev,
-					...latestPrices,
-				}));
+		console.log('Online status changed:', isOnline);
+		if (!isOnline) {
+			if (socketRef.current) {
+				socketRef.current.close();
+				socketRef.current = null;
+				console.log('WebSocket disconnected due to offline status');
 			}
-		};
+		} else {
+			if (!socketRef.current) {
+				socketRef.current = new WebSocket(SOCKET_URL);
+				socketRef.current.onopen = () => {
+					if (!isIntialConnectionDone.current) {
+						const storedData = getStocksSavedInLocalStorage();
+						storedData.forEach((h) => {
+							subscribedSymbolsRef.current.add(h.stock.symbol);
+							socketRef.current?.send(
+								JSON.stringify({
+									type: 'subscribe',
+									symbol: h.stock.symbol,
+								})
+							);
+						});
+						isIntialConnectionDone.current = true;
+					}
+				};
+
+				socketRef.current.onmessage = (event) => {
+					const data = JSON.parse(event.data) as {
+						type: string;
+						data: StreamStockPrice[];
+					};
+					console.log({ onmessage: data });
+					if (data.type === 'trade' && data.data && Array.isArray(data.data)) {
+						const streamFirstData: StreamStockPrice = data.data[0];
+						if (streamFirstData && streamFirstData.s) {
+							historicalRef.current = historicalRef.current.map((h) => {
+								if (h.stock.symbol == streamFirstData.s) {
+									const prices = h.prices;
+									const lastPrice = h.prices?.length
+										? h.prices[h.prices.length - 1].price
+										: streamFirstData.p;
+									const newPrice: StockPricePoint = {
+										prevPrice: lastPrice,
+										price: streamFirstData.p,
+										timestamp: streamFirstData.t,
+									};
+									const updatedHistory: StockHistory = {
+										...h,
+										prices: [...prices, newPrice],
+									};
+									return updatedHistory;
+								}
+								return h;
+							});
+							setHistory(historicalRef.current);
+						}
+					}
+				};
+			}
+		}
 
 		return () => {
-			socket.close();
+			if (socketRef.current) {
+				socketRef.current.close();
+				socketRef.current = null;
+				console.log('WebSocket disconnected on cleanup');
+			}
 		};
-	}, [stockList]);
+	}, [isOnline]);
+
+	useEffect(() => {
+		const storedData = getStocksSavedInLocalStorage();
+
+		if (storedData && storedData.length > 0) {
+			historicalRef.current = storedData;
+			setHistory(historicalRef.current);
+			storedData.forEach((h) => {
+				subscribeStockToSocket(h.stock.symbol);
+			});
+		}
+	}, [isOnline]);
+
+	const updateHistory = (updatedHistory: StockHistory[]) => {
+		historicalRef.current = updatedHistory;
+		setHistory(historicalRef.current);
+		saveInLocalStorage(updatedHistory, 'stockHistory');
+	};
+
+	const subscribeStockToSocket = (symbol: string) => {
+		if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+			if (!subscribedSymbolsRef.current.has(symbol)) {
+				subscribedSymbolsRef.current.add(symbol);
+				console.log('Subscribing to stock:', symbol);
+				console.log('Currently subscribed stocks:', socketRef.current);
+				socketRef.current.send(
+					JSON.stringify({
+						type: 'subscribe',
+						symbol: symbol,
+					})
+				);
+			}
+		}
+	};
+
+	const unsubscribeStockSocket = (symbol: string) => {
+		if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+			socketRef.current.send(JSON.stringify({ type: 'unsubscribe', symbol }));
+		}
+		subscribedSymbolsRef.current.delete(symbol);
+		console.log(`Unsuscribing ${symbol}`);
+	};
 
 	const subscribeNewStock = (historicalStock: StockHistory) => {
-		setHistory((prev) => {
-			saveInLocalStorage([...prev, historicalStock]);
-			return [...prev, historicalStock];
-		});
-		const currentPrice =
-			historicalStock.prices.length > 0
-				? historicalStock.prices[historicalStock.prices.length - 1].price
-				: 0;
-		setPrices((prev) => ({
-			...prev,
-			[historicalStock.stock.symbol]: {
-				price: currentPrice,
-				prevPrice: currentPrice,
-			},
-		}));
+		updateHistory([...historicalRef.current, historicalStock]);
+		subscribeStockToSocket(historicalStock.stock.symbol);
 	};
 
 	const unsubscribeStock = (symbol: string) => {
-		setHistory((prev) => {
-			const updatedHistory = prev.filter((h) => h.stock.symbol !== symbol);
-			saveInLocalStorage(updatedHistory);
-			return updatedHistory;
-		});
-		setPrices((prev) => {
-			const updatedPrices = { ...prev };
-			delete updatedPrices[symbol];
-			return updatedPrices;
-		});
+		const updatedHistory = historicalRef.current.filter(
+			(h) => h.stock.symbol !== symbol
+		);
+		updateHistory(updatedHistory);
+		unsubscribeStockSocket(symbol);
 	};
 
-	return [
-		prices,
+	return {
 		history,
 		subscribeNewStock,
 		unsubscribeStock,
-		loadFromLocalStorage,
-	];
+	};
 }

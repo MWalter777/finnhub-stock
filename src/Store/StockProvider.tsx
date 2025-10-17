@@ -13,11 +13,11 @@ import {
 } from '../utils/getStockSymbols';
 import { PriceRecord } from '../types/StockSocket';
 import { StockHistory, StockPricePoint } from '../types/StockProvider';
+import { getStocksSavedInLocalStorage } from '@/utils/localStorageHandle';
 
 type StockContext = {
 	stocks: IStock[];
 	stockHistory: StockHistory[];
-	stockPrices: PriceRecord;
 };
 
 type StockActionContext = {
@@ -30,7 +30,6 @@ type StockFullContext = StockContext & StockActionContext;
 const defaultState: StockFullContext = {
 	stocks: [],
 	stockHistory: [],
-	stockPrices: {},
 	addStockHistory: async () => {},
 	removeStock: () => {},
 };
@@ -43,13 +42,11 @@ type Props = {
 
 const StockProvider = ({ children }: Props) => {
 	const [stocks, setStocks] = useState<IStock[]>([]);
-	const [
-		stockPrices,
-		stockHistory,
+	const {
+		history: stockHistory,
 		subscribeNewStock,
 		unsubscribeStock,
-		loadFromLocalStorage,
-	] = useStockSocket([]);
+	} = useStockSocket();
 
 	const updateHistoricalStock = async (stock: IStock, alertPrice: number) => {
 		const initialData = await getInitialValueBySymbol(stock.symbol);
@@ -82,7 +79,7 @@ const StockProvider = ({ children }: Props) => {
 
 	useEffect(() => {
 		const getStocks = async () => {
-			const stockSaved = loadFromLocalStorage();
+			const stockSaved = getStocksSavedInLocalStorage();
 			const stocks = (await getStockSymbols()).filter(
 				(stock) => !stockSaved.find((s) => s.stock.symbol === stock.symbol)
 			);
@@ -98,7 +95,6 @@ const StockProvider = ({ children }: Props) => {
 			value={{
 				stocks,
 				stockHistory: stockHistory,
-				stockPrices,
 				addStockHistory: updateHistoricalStock,
 				removeStock,
 			}}
