@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { RefObject, useEffect, useRef, useState } from 'react';
 import { StreamStockPrice } from '../types/Stock';
 import { PriceRecord } from '../types/StockSocket';
 import { StockHistory, StockPricePoint } from '../types/StockProvider';
@@ -19,7 +19,6 @@ export default function useStockSocket(
 	const [history, setHistory] = useState<StockHistory[]>([]);
 
 	const saveInLocalStorage = (data: StockHistory[]) => {
-		console.log('Saving stock history to localStorage:', data);
 		if (typeof window !== 'undefined' && data.length > 0) {
 			localStorage.setItem('stockHistory', JSON.stringify(data));
 		}
@@ -92,6 +91,7 @@ export default function useStockSocket(
 						if (stockHist) {
 							stockHist.prices.push(pricePoint);
 						}
+						saveInLocalStorage(prevHist);
 						return [...prevHist];
 					});
 				});
@@ -103,14 +103,16 @@ export default function useStockSocket(
 		};
 
 		return () => {
-			saveInLocalStorage(history);
 			socket.close();
 			console.log('WebSocket disconnected');
 		};
 	}, [stockList]);
 
 	const subscribeNewStock = (historicalStock: StockHistory) => {
-		setHistory((prev) => [...prev, historicalStock]);
+		setHistory((prev) => {
+			saveInLocalStorage([...prev, historicalStock]);
+			return [...prev, historicalStock];
+		});
 		const currentPrice =
 			historicalStock.prices.length > 0
 				? historicalStock.prices[historicalStock.prices.length - 1].price
@@ -125,7 +127,11 @@ export default function useStockSocket(
 	};
 
 	const unsubscribeStock = (symbol: string) => {
-		setHistory((prev) => prev.filter((h) => h.stock.symbol !== symbol));
+		setHistory((prev) => {
+			const updatedHistory = prev.filter((h) => h.stock.symbol !== symbol);
+			saveInLocalStorage(updatedHistory);
+			return updatedHistory;
+		});
 		setPrices((prev) => {
 			const updatedPrices = { ...prev };
 			delete updatedPrices[symbol];

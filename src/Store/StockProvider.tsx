@@ -73,12 +73,7 @@ const StockProvider = ({ children }: Props) => {
 	};
 
 	const removeStock = (symbol: string) => {
-		console.log('Removing stock:', symbol);
 		const stock = stockHistory.find((s) => s.stock.symbol === symbol);
-		console.log('Found stock to remove:', {
-			stock,
-			stockHistory,
-		});
 		if (!stock) return;
 		const newListStocks: IStock[] = [stock.stock, ...stocks];
 		setStocks(newListStocks);
