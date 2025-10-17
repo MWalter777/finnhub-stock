@@ -4,7 +4,7 @@ import { useStockContext } from '@/Store/StockProvider';
 import { StockHistory } from '@/types/StockProvider';
 import CloseIcon from '@mui/icons-material/Close';
 import BodyCard from './BodyCard';
-import { getColor } from '@/utils/colors';
+import { getColor } from '@/utils/graphUtils';
 
 type Props = {
 	stockHistory: StockHistory;
