@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { StreamStockPrice } from '../types/Stock';
-import { PriceRecord } from '../types/StockSocket';
 import { StockHistory, StockPricePoint } from '../types/StockProvider';
 import { useOnlineStatus } from './useOnlineStatus';
 import { UseStockSocketReturn } from '@/types/UseStockSocket';
@@ -8,7 +7,7 @@ import {
 	getStocksSavedInLocalStorage,
 	saveLastestHistoricalData,
 } from '@/utils/localStorageHandle';
-import useShowNotification from './useShowNotification';
+import { useShowNotification } from '@/hook/useShowNotification';
 
 const API_KEY = process.env.NEXT_PUBLIC_FINNHUB_API_KEY;
 const SOCKET_URL = `wss://ws.finnhub.io?token=${API_KEY}`;
@@ -20,7 +19,7 @@ const SOCKET_URL = `wss://ws.finnhub.io?token=${API_KEY}`;
  * @returns An object containing the stock price history and functions to
  * subscribe/unsubscribe to stock symbols.
  */
-export default function useStockSocket(): UseStockSocketReturn {
+export const useStockSocket = (): UseStockSocketReturn => {
 	const { isOnline } = useOnlineStatus();
 	const [history, setHistory] = useState<StockHistory[]>([]);
 	const historicalRef = useRef<StockHistory[]>([]);
@@ -28,6 +27,18 @@ export default function useStockSocket(): UseStockSocketReturn {
 	const socketRef = useRef<WebSocket | null>(null);
 	// push notification
 	const { sendCustomNotification } = useShowNotification();
+
+	useEffect(() => {
+		const storedData = getStocksSavedInLocalStorage();
+
+		if (storedData && storedData.length > 0) {
+			historicalRef.current = storedData;
+			setHistory(historicalRef.current);
+			storedData.forEach((h) => {
+				subscribeStockToSocket(h.stock.symbol);
+			});
+		}
+	}, [isOnline]);
 
 	useEffect(() => {
 		if (!isOnline) {
@@ -38,7 +49,7 @@ export default function useStockSocket(): UseStockSocketReturn {
 		} else {
 			if (!socketRef.current) {
 				socketRef.current = new WebSocket(SOCKET_URL);
-				socketRef.current.onopen = () => {
+				socketRef.current.addEventListener('open', () => {
 					const storedData = getStocksSavedInLocalStorage();
 					storedData.forEach((h) => {
 						subscribedSymbolsRef.current.add(h.stock.symbol);
@@ -49,9 +60,9 @@ export default function useStockSocket(): UseStockSocketReturn {
 							})
 						);
 					});
-				};
+				});
 
-				socketRef.current.onmessage = (event) => {
+				socketRef.current.addEventListener('message', (event) => {
 					const data = JSON.parse(event.data) as {
 						type: string;
 						data: StreamStockPrice[];
@@ -83,7 +94,7 @@ export default function useStockSocket(): UseStockSocketReturn {
 							updateHistory(currentHistoricalData);
 						}
 					}
-				};
+				});
 			}
 		}
 
@@ -93,18 +104,6 @@ export default function useStockSocket(): UseStockSocketReturn {
 				socketRef.current = null;
 			}
 		};
-	}, [isOnline]);
-
-	useEffect(() => {
-		const storedData = getStocksSavedInLocalStorage();
-
-		if (storedData && storedData.length > 0) {
-			historicalRef.current = storedData;
-			setHistory(historicalRef.current);
-			storedData.forEach((h) => {
-				subscribeStockToSocket(h.stock.symbol);
-			});
-		}
 	}, [isOnline]);
 
 	const updateHistory = (updatedHistory: StockHistory[]) => {
@@ -152,4 +151,6 @@ export default function useStockSocket(): UseStockSocketReturn {
 		subscribeNewStock,
 		unsubscribeStock,
 	};
-}
+};
+
+export default useStockSocket;

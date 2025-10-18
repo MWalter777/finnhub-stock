@@ -1,5 +1,5 @@
 import { StockPricePoint } from '@/types/StockProvider';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
 const askPermission = async () => {
 	if (!('Notification' in window)) {
@@ -29,7 +29,7 @@ const sendNotification = (title: string, options: NotificationOptions) => {
 	}
 };
 
-const useShowNotification = () => {
+export const useShowNotification = () => {
 	useEffect(() => {
 		askPermission();
 	}, []);
