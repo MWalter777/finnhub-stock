@@ -39,7 +39,6 @@ export const useShowNotification = () => {
 			newPrice.price < h.alertPrice &&
 			!stocksAlertedRef.current.has(h.stock.symbol)
 		) {
-			console.log('Sending notification for', h.stock.symbol);
 			const title = `Stock: ${h.stock.symbol} dropped below $${h.alertPrice}`;
 			const options: NotificationOptions = {
 				body: `Current Price: $${newPrice.price}`,
@@ -50,8 +49,6 @@ export const useShowNotification = () => {
 				h.stock.symbol,
 			]);
 			sendNotification(title, options);
-		} else {
-			console.log('No notification sent for', h.stock.symbol);
 		}
 	};
 

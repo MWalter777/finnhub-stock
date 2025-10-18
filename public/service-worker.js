@@ -70,7 +70,15 @@ self.addEventListener('fetch', (event) => {
  * If no data is provided, default values are used.
  */
 self.addEventListener('push', (event) => {
-	const data = JSON.parse(event?.data?.payload || '{}') || {};
+	let data = {};
+	if (event.data) {
+		try {
+			data = event.data.json();
+		} catch (e) {
+			void e;
+			data = { title: 'Finnhub', body: 'Stock dropped', url: '/' };
+		}
+	}
 	const title = data.title || 'Finnhub';
 	const body = data.body || 'No data';
 	const url = data.url || '/';
