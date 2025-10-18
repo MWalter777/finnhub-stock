@@ -120,7 +120,7 @@ const initialData: StockHistory[] = [
 			isin: null,
 			mic: 'BTC-USD',
 			shareClassFIGI: 'BBG001STEST',
-			symbol: 'BTC-USD',
+			symbol: 'BINANCE:BTCUSDT',
 			symbol2: 'BTC-USD',
 			type: 'Common Stock',
 		},
@@ -130,17 +130,17 @@ const initialData: StockHistory[] = [
 	{
 		stock: {
 			currency: 'USD',
-			description: 'ETH-USD',
-			displaySymbol: 'ETH-USD',
+			description: 'IC MARKETS:1',
+			displaySymbol: 'IC MARKETS:1',
 			figi: 'BBG001STESTETH-USD',
 			isin: null,
 			mic: 'ETH-USD',
 			shareClassFIGI: 'BBG001STESTETH-USD',
-			symbol: 'ETH-USD',
-			symbol2: 'ETH-USD',
+			symbol: 'IC MARKETS:1',
+			symbol2: 'IC MARKETS:1',
 			type: 'Common Stock',
 		},
-		alertPrice: 3873.54,
+		alertPrice: 73.54,
 		prices: [],
 	},
 ];
@@ -182,7 +182,7 @@ export const saveLastestHistoricalData = (historicalData: StockHistory[]) => {
  */
 export const getStocksSavedInLocalStorage = (): StockHistory[] => {
 	const storedData = localStorage.getItem(lOCAL_STORE_ITEMS.stockHistory);
-	if (storedData) {
+	if (storedData && storedData.length > 0) {
 		try {
 			const parsedData = JSON.parse(storedData) as StockHistory[];
 			return parsedData;

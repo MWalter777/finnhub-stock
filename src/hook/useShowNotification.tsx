@@ -1,5 +1,5 @@
 import { StockHistory, StockPricePoint } from '@/types/StockProvider';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 const askPermission = async () => {
 	if (!('Notification' in window)) {
@@ -25,6 +25,7 @@ const sendNotification = (title: string, options: NotificationOptions) => {
 };
 
 export const useShowNotification = () => {
+	const [stocksAlerted, setStocksAlerted] = useState<Set<string>>(new Set());
 	useEffect(() => {
 		askPermission();
 	}, []);
@@ -33,12 +34,13 @@ export const useShowNotification = () => {
 		h: StockHistory,
 		newPrice: StockPricePoint
 	) => {
-		if (newPrice.price < h.alertPrice) {
+		if (newPrice.price < h.alertPrice && !stocksAlerted.has(h.stock.symbol)) {
 			const title = `Stock: ${h.stock.symbol} dropped below $${h.alertPrice}`;
 			const options: NotificationOptions = {
 				body: `Current Price: $${newPrice.price}`,
 				icon: '/manifest-192x192.png',
 			};
+			setStocksAlerted((prev) => new Set(prev).add(h.stock.symbol));
 			sendNotification(title, options);
 		}
 	};

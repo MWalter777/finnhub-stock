@@ -46,7 +46,7 @@ describe('saveInLocalStorage test', () => {
 		// Clear localStorage
 		localStorage.clear();
 		const result = getStocksSavedInLocalStorage();
-		expect(result.length).toBe(2); // Based on the initial mock data in localStorageHandle.ts
+		expect(result.length).toBe(4); // Based on the initial mock data in localStorageHandle.ts
 	});
 
 	it('getStocksSavedInLocalStorage should return saved data', () => {
@@ -69,7 +69,7 @@ describe('saveInLocalStorage test', () => {
 	it('getStocksSavedInLocalStorage should return initial data if parsing fails', () => {
 		localStorage.setItem(lOCAL_STORE_ITEMS.stockHistory, 'invalid JSON');
 		const result = getStocksSavedInLocalStorage();
-		expect(result.length).toBe(2); // Based on the initial mock data in localStorageHandle.ts
+		expect(result.length).toBe(4); // Based on the initial mock data in localStorageHandle.ts
 		// Clean up
 		localStorage.removeItem(lOCAL_STORE_ITEMS.stockHistory);
 	});
