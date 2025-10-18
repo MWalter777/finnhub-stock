@@ -30,7 +30,7 @@ const navItems: Items[] = [
 		name: 'documentation',
 	},
 	{
-		link: '/code-coverage-2025-10-18.png',
+		link: 'https://raw.githubusercontent.com/MWalter777/finnhub-stock/master/code-coverage-2025-10-18.png',
 		name: 'test-coverage',
 	},
 ];
