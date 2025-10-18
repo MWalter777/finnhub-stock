@@ -83,14 +83,14 @@ describe('useStockSocket', () => {
 	it('useStockSocket should return UseStockSocketReturn', () => {
 		const {
 			result: { current: result },
-		} = renderHook(() => useStockSocket());
+		} = renderHook(() => useStockSocket(true));
 		expect(result).toHaveProperty('history');
 		expect(result).toHaveProperty('subscribeNewStock');
 		expect(result).toHaveProperty('unsubscribeStock');
 	});
 
 	it('should handle incoming WebSocket messages and update history', () => {
-		const { result } = renderHook(() => useStockSocket());
+		const { result } = renderHook(() => useStockSocket(true));
 		expect(result.current.history.length).toBe(1); // Initial history length
 		act(() => {
 			expect(result.current.history[0].prices.length).toBe(2); // Updated history length
@@ -98,7 +98,7 @@ describe('useStockSocket', () => {
 	});
 
 	it('unsubscribeStock should remove stock from history', () => {
-		const { result } = renderHook(() => useStockSocket());
+		const { result } = renderHook(() => useStockSocket(true));
 		act(() => {
 			result.current.unsubscribeStock('AAPL');
 		});
@@ -106,7 +106,7 @@ describe('useStockSocket', () => {
 	});
 
 	it('subscribeNewStock should add new stock to history', () => {
-		const { result } = renderHook(() => useStockSocket());
+		const { result } = renderHook(() => useStockSocket(true));
 		act(() => {
 			result.current.subscribeNewStock({
 				stock: { symbol: 'MSFT' },

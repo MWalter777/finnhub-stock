@@ -17,11 +17,13 @@ import { getStocksSavedInLocalStorage } from '@/utils/localStorageHandle';
 type StockContext = {
 	stocks: IStock[];
 	stockHistory: StockHistory[];
+	isEnabledSocket: boolean;
 };
 
 type StockActionContext = {
 	addStockHistory: (stock: IStock, alertPrice: number) => Promise<void>;
 	removeStock: (symbol: string) => void;
+	toggleSocketConnection: () => void;
 };
 
 type StockFullContext = StockContext & StockActionContext;
@@ -31,6 +33,8 @@ const defaultState: StockFullContext = {
 	stockHistory: [],
 	addStockHistory: async () => {},
 	removeStock: () => {},
+	isEnabledSocket: false,
+	toggleSocketConnection: () => {},
 };
 
 const stockContext = createContext<StockFullContext>(defaultState);
@@ -51,6 +55,8 @@ const StockProvider = ({ children }: Props) => {
 		history: stockHistory,
 		subscribeNewStock,
 		unsubscribeStock,
+		isEnabledSocket,
+		toggleSocketConnection,
 	} = useStockSocket();
 
 	const updateHistoricalStock = async (stock: IStock, alertPrice: number) => {
@@ -102,6 +108,8 @@ const StockProvider = ({ children }: Props) => {
 				stockHistory: stockHistory,
 				addStockHistory: updateHistoricalStock,
 				removeStock,
+				isEnabledSocket,
+				toggleSocketConnection,
 			}}
 		>
 			{children}

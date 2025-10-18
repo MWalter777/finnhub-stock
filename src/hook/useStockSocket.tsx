@@ -19,12 +19,14 @@ const SOCKET_URL = `wss://ws.finnhub.io?token=${API_KEY}`;
  * @returns An object containing the stock price history and functions to
  * subscribe/unsubscribe to stock symbols.
  */
-export const useStockSocket = (): UseStockSocketReturn => {
+export const useStockSocket = (enabledSocket = false): UseStockSocketReturn => {
 	const { isOnline } = useOnlineStatus();
 	const [history, setHistory] = useState<StockHistory[]>([]);
 	const historicalRef = useRef<StockHistory[]>([]);
 	const subscribedSymbolsRef = useRef<Set<string>>(new Set());
 	const socketRef = useRef<WebSocket | null>(null);
+	const [isEnabledSocket, setIsEnabledSocket] =
+		useState<boolean>(enabledSocket);
 	// push notification
 	const { sendCustomNotification } = useShowNotification();
 
@@ -47,7 +49,7 @@ export const useStockSocket = (): UseStockSocketReturn => {
 				socketRef.current = null;
 			}
 		} else {
-			if (!socketRef.current) {
+			if (!socketRef.current && isEnabledSocket) {
 				socketRef.current = new WebSocket(SOCKET_URL);
 				socketRef.current.addEventListener('open', () => {
 					const storedData = getStocksSavedInLocalStorage();
@@ -105,12 +107,16 @@ export const useStockSocket = (): UseStockSocketReturn => {
 			}
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [isOnline]);
+	}, [isOnline, isEnabledSocket]);
 
 	const updateHistory = (updatedHistory: StockHistory[]) => {
 		historicalRef.current = updatedHistory;
 		setHistory(updatedHistory);
 		saveLastestHistoricalData(updatedHistory);
+	};
+
+	const toggleSocketConnection = () => {
+		setIsEnabledSocket((prev) => !prev);
 	};
 
 	const subscribeStockToSocket = (symbol: string) => {
@@ -151,6 +157,8 @@ export const useStockSocket = (): UseStockSocketReturn => {
 		history,
 		subscribeNewStock,
 		unsubscribeStock,
+		toggleSocketConnection,
+		isEnabledSocket,
 	};
 };
 
