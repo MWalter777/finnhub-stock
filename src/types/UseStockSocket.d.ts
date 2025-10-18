@@ -1,5 +1,4 @@
 import { StockHistory } from './StockProvider';
-import { PriceRecord } from './StockSocket';
 
 export type UseStockSocketReturn = {
 	history: StockHistory[];

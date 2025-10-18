@@ -104,6 +104,7 @@ export const useStockSocket = (): UseStockSocketReturn => {
 				socketRef.current = null;
 			}
 		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [isOnline]);
 
 	const updateHistory = (updatedHistory: StockHistory[]) => {

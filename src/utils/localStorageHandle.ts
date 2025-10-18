@@ -155,6 +155,7 @@ export const getStocksSavedInLocalStorage = (): StockHistory[] => {
 			const parsedData = JSON.parse(storedData) as StockHistory[];
 			return parsedData;
 		} catch (error) {
+			void error;
 			return initialData;
 		}
 	}
