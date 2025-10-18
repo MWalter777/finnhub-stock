@@ -10,12 +10,7 @@ const askPermission = async () => {
 		console.log('Notification permission already granted.');
 		return;
 	}
-	const permission = await Notification.requestPermission();
-	if (permission === 'granted') {
-		console.log('Notification permission granted.');
-	} else {
-		console.log('Notification permission denied.');
-	}
+	await Notification.requestPermission();
 };
 
 const sendNotification = (title: string, options: NotificationOptions) => {
