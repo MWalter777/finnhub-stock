@@ -26,7 +26,7 @@ type Items = {
 
 const navItems: Items[] = [
 	{
-		link: 'https://github.com/MWalter777/finnhub-stock?tab=readme-ov-file#getting-started',
+		link: 'https://github.com/MWalter777/finnhub-stock?tab=readme-ov-file#finnhub-stock-tracker',
 		name: 'documentation',
 	},
 	{
