@@ -72,6 +72,7 @@ const StockToWatchForm = () => {
 				label='Price alert'
 				variant='standard'
 				type='number'
+				data-testid='alertPrice'
 				error={!!errors.alertPrice}
 				helperText={errors.alertPrice?.message}
 				disabled={stockHistory.length >= MAX_STOCKS}

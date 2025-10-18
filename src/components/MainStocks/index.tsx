@@ -12,7 +12,6 @@ const MainStocks = () => {
 				<TopCards />
 			</StockSection>
 			<GraphStocks />
-			<section></section>
 		</MainContainer>
 	);
 };
