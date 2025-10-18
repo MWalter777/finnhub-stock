@@ -82,7 +82,7 @@ export const useStockSocket = (): UseStockSocketReturn => {
 										timestamp: new Date().getTime(),
 									};
 									// send notification
-									sendCustomNotification(h.stock.symbol, newPrice);
+									sendCustomNotification(h, newPrice);
 									const updatedHistory: StockHistory = {
 										...h,
 										prices: [...prices, newPrice],

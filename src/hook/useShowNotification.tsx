@@ -1,4 +1,4 @@
-import { StockPricePoint } from '@/types/StockProvider';
+import { StockHistory, StockPricePoint } from '@/types/StockProvider';
 import { useEffect } from 'react';
 
 const askPermission = async () => {
@@ -30,17 +30,17 @@ export const useShowNotification = () => {
 	}, []);
 
 	const sendCustomNotification = (
-		symbol: string,
+		h: StockHistory,
 		newPrice: StockPricePoint
 	) => {
-		const title = `Stock: ${symbol}`;
-		const options: NotificationOptions = {
-			body: `New price: $${newPrice.price.toFixed(
-				2
-			)} (Previous: $${newPrice.prevPrice.toFixed(2)})`,
-			icon: '/icon-192x192.png',
-		};
-		sendNotification(title, options);
+		if (newPrice.price < h.alertPrice) {
+			const title = `Stock: ${h.stock.symbol} dropped below $${h.alertPrice}`;
+			const options: NotificationOptions = {
+				body: `Current Price: $${newPrice.price}`,
+				icon: '/icon-192x192.png',
+			};
+			sendNotification(title, options);
+		}
 	};
 
 	return { sendCustomNotification };
