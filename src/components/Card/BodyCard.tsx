@@ -12,7 +12,6 @@ type Props = {
 const BodyCard = ({ priceData }: Props) => {
 	const isDownward = priceData.price < priceData.prevPrice;
 	const symbol = isDownward ? '-' : '';
-	console.log({ symbol });
 	const difference = Math.abs(priceData.price - priceData.prevPrice);
 	const percentageChange =
 		(priceData.prevPrice
