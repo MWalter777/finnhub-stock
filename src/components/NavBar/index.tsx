@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 const drawerWidth = 240;
 
@@ -26,43 +26,36 @@ type Items = {
 
 const navItems: Items[] = [
 	{
-		link: '/',
-		name: 'Home',
+		link: 'https://github.com/MWalter777/finnhub-stock?tab=readme-ov-file#getting-started',
+		name: 'documentation',
 	},
 	{
-		link: '/documentation',
-		name: 'Documentation',
-	},
-	{
-		link: '/test-coverage',
-		name: 'Test Coverage',
+		link: '/code-coverage-2025-10-18.png',
+		name: 'test-coverage',
 	},
 ];
 
 const NavBar = () => {
 	const [mobileOpen, setMobileOpen] = useState(false);
-	const router = useRouter();
 	const handleDrawerToggle = () => {
 		setMobileOpen((prevState) => !prevState);
-	};
-	const redirectTo = (link: string) => () => {
-		router.push(link);
 	};
 
 	const drawer = (
 		<Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
 			<Typography variant='h6' sx={{ my: 2 }}>
-				MUI
+				<Link href='/' style={{ textDecoration: 'none', color: 'inherit' }}>
+					Finnhub stock
+				</Link>
 			</Typography>
 			<Divider />
 			<List>
 				{navItems.map((item) => (
 					<ListItem key={item.link} disablePadding>
-						<ListItemButton
-							onClick={redirectTo(item.link)}
-							sx={{ textAlign: 'center' }}
-						>
-							<ListItemText primary={item.name} />
+						<ListItemButton sx={{ textAlign: 'center' }}>
+							<a href={item.link} target='_blank' rel='noopener noreferrer'>
+								<ListItemText primary={item.name} />
+							</a>
 						</ListItemButton>
 					</ListItem>
 				))}
@@ -87,12 +80,16 @@ const NavBar = () => {
 						component='div'
 						sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
 					>
-						Finnhub stock
+						<Link href='/' style={{ textDecoration: 'none', color: 'inherit' }}>
+							Finnhub stock
+						</Link>
 					</Typography>
 					<Box sx={{ display: { xs: 'none', sm: 'block' } }}>
 						{navItems.map((item) => (
-							<Button onClick={redirectTo(item.link)} key={item.link}>
-								{item.name}
+							<Button key={item.link}>
+								<a href={item.link} target='_blank' rel='noopener noreferrer'>
+									{item.name}
+								</a>
 							</Button>
 						))}
 					</Box>
