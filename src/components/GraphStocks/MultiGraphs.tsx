@@ -35,7 +35,7 @@ const MultiGraphs = ({ stockHistory }: Props) => {
 								<XAxis
 									dataKey='time'
 									domain={['auto', 'auto']}
-									tickFormatter={(t) => new Date(t).toLocaleTimeString()}
+									tickFormatter={(t) => ''}
 								/>
 								<YAxis
 									domain={[

@@ -6,7 +6,7 @@ import { MainContainer, StockSection } from './index.styled';
 
 const MainStocks = () => {
 	return (
-		<MainContainer className='w-full flex flex-col gap-4'>
+		<MainContainer className='w-full flex flex-col gap-4 pt-4 md:pt-8'>
 			<StockSection>
 				<StockToWatchForm />
 				<TopCards />
