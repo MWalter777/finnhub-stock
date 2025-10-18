@@ -20,8 +20,8 @@ jest.mock('swiper/react', () => ({
 // mock 'swiper/css'
 jest.mock('swiper/css', () => {});
 
-describe('MainStocks', () => {
-	it('renders a heading', async () => {
+describe('TopCards', () => {
+	it('render a list of text', async () => {
 		render(<TopCards />);
 
 		expect(screen.getByText('AAPL')).toBeInTheDocument();
