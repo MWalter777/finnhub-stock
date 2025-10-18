@@ -14,7 +14,7 @@ export const getColor = (i: number) => {
  * @param history: stock history data
  * @returns merged stock history for graphing
  */
-export function mergeHistory(history: StockHistory) {
+export function mergeHistory(history?: StockHistory) {
 	const merged: {
 		[x: string]: number | null;
 	}[] = [];
@@ -33,7 +33,7 @@ export function mergeHistory(history: StockHistory) {
 		const point: { [key in string]: number | null } = { time: ts };
 		const pricePoint = history?.prices.find((p) => p.timestamp === ts);
 		if (pricePoint) lastValues[symbols] = pricePoint.price;
-		point[symbols] = lastValues[symbols] ?? null;
+		point[symbols] = lastValues[symbols];
 		merged.push(point);
 	});
 

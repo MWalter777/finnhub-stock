@@ -11,7 +11,6 @@ import {
 	getInitialValueBySymbol,
 	getStockSymbols,
 } from '../utils/getStockSymbols';
-import { PriceRecord } from '../types/StockSocket';
 import { StockHistory, StockPricePoint } from '../types/StockProvider';
 import { getStocksSavedInLocalStorage } from '@/utils/localStorageHandle';
 

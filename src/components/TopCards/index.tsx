@@ -9,6 +9,7 @@ const TopCards = () => {
 	const { stockHistory } = useStockContext();
 	return (
 		<TopCardSection>
+			<h3 className='text-2xl font-semibold text-gray-600'>Overview</h3>
 			<Swiper
 				spaceBetween={50}
 				slidesPerView={1}

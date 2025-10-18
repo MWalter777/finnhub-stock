@@ -149,17 +149,15 @@ export const saveLastestHistoricalData = (historicalData: StockHistory[]) => {
  * @returns An array of StockHistory objects.
  */
 export const getStocksSavedInLocalStorage = (): StockHistory[] => {
-	if (typeof window !== 'undefined') {
-		const storedData = localStorage.getItem(lOCAL_STORE_ITEMS.stockHistory);
-		if (storedData) {
-			try {
-				const parsedData = JSON.parse(storedData) as StockHistory[];
-				return parsedData;
-			} catch (error) {
-				console.error('Error parsing stock history from localStorage:', error);
-			}
+	const storedData = localStorage.getItem(lOCAL_STORE_ITEMS.stockHistory);
+	if (storedData) {
+		try {
+			const parsedData = JSON.parse(storedData) as StockHistory[];
+			return parsedData;
+		} catch (error) {
+			void error;
+			return initialData;
 		}
-		return initialData;
 	}
-	return [];
+	return initialData;
 };

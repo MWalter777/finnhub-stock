@@ -62,3 +62,46 @@ self.addEventListener('fetch', (event) => {
 			})
 	);
 });
+
+/**
+ * Push Notification Event
+ * Sends a notification when a push event is received.
+ * The notification displays the title, body, and an optional URL.
+ * If no data is provided, default values are used.
+ */
+self.addEventListener('push', (event) => {
+	const data = JSON.parse(event?.data?.payload || '{}') || {};
+	const title = data.title || 'Finnhub';
+	const body = data.body || 'No data';
+	const url = data.url || '/';
+
+	event.waitUntil(
+		self.registration.showNotification(title, {
+			body,
+			data: { url },
+			icon: '/manifest-192x192.png',
+		})
+	);
+});
+
+/**
+ * Message Event
+ * Sends a notification when a message event is received.
+ * The notification displays the title, body, and an optional URL.
+ * If no data is provided, default values are used.
+ * this is just for testing purposes
+ */
+self.addEventListener('message', (event) => {
+	const data = JSON.parse(event?.data?.payload || '{}') || {};
+	const title = data.title || 'Finnhub';
+	const body = data.body || 'No data';
+	const url = data.url || '/';
+
+	event.waitUntil(
+		self.registration.showNotification(title, {
+			body,
+			data: { url },
+			icon: '/manifest-192x192.png',
+		})
+	);
+});

@@ -52,6 +52,7 @@ const StockToWatchForm = () => {
 							option.symbol === value.symbol
 						}
 						className='w-full'
+						data-testid='stock-autocomplete'
 						value={field.value}
 						onChange={(_, newValue) => field.onChange(newValue)}
 						disabled={stockHistory.length >= MAX_STOCKS}
@@ -72,6 +73,7 @@ const StockToWatchForm = () => {
 				label='Price alert'
 				variant='standard'
 				type='number'
+				data-testid='alertPrice'
 				error={!!errors.alertPrice}
 				helperText={errors.alertPrice?.message}
 				disabled={stockHistory.length >= MAX_STOCKS}
@@ -98,6 +100,7 @@ const StockToWatchForm = () => {
 				type='submit'
 				variant='contained'
 				className='w-full'
+				data-testid='add-stock-button'
 			>
 				Add stock
 			</Button>

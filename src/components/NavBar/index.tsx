@@ -72,7 +72,7 @@ const NavBar = () => {
 	return (
 		<>
 			<AppBar component='nav'>
-				<Toolbar>
+				<Toolbar className='bg-white text-gray-700'>
 					<IconButton
 						color='inherit'
 						aria-label='open drawer'
@@ -91,11 +91,7 @@ const NavBar = () => {
 					</Typography>
 					<Box sx={{ display: { xs: 'none', sm: 'block' } }}>
 						{navItems.map((item) => (
-							<Button
-								onClick={redirectTo(item.link)}
-								key={item.link}
-								sx={{ color: '#fff' }}
-							>
+							<Button onClick={redirectTo(item.link)} key={item.link}>
 								{item.name}
 							</Button>
 						))}
