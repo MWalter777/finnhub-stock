@@ -15,7 +15,7 @@ const askPermission = async () => {
 
 const sendNotification = (title: string, options: NotificationOptions) => {
 	if (Notification.permission === 'granted') {
-		const payload = JSON.stringify({ title, options });
+		const payload = JSON.stringify({ title, ...options });
 		navigator.serviceWorker.ready.then((reg) => {
 			if (reg.active) {
 				reg.active.postMessage({ type: 'stock', payload });
@@ -39,9 +39,9 @@ export const useShowNotification = () => {
 			newPrice.price < h.alertPrice &&
 			!stocksAlertedRef.current.has(h.stock.symbol)
 		) {
-			const title = `Stock: ${h.stock.symbol} dropped below $${h.alertPrice}`;
+			const title = `Stock: ${h.stock.symbol}`;
 			const options: NotificationOptions = {
-				body: `Current Price: $${newPrice.price}`,
+				body: `${h.stock.symbol} dropped below $${h.alertPrice}.\nCurrent price: $${newPrice.price}`,
 				icon: '/manifest-192x192.png',
 			};
 			stocksAlertedRef.current = new Set([
