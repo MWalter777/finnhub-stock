@@ -71,18 +71,28 @@ describe('useShowNotification', () => {
 		});
 		const { result } = renderHook(() => useShowNotification());
 		await act(async () => {
-			result.current.sendCustomNotification('AAPL', {
-				price: 150,
-				prevPrice: 145,
-			} as any);
+			result.current.sendCustomNotification(
+				{
+					alertPrice: 160,
+					stock: {
+						symbol: 'AAPL',
+						description: 'Apple Inc.',
+					},
+					prices: [],
+				} as any,
+				{
+					price: 150,
+					prevPrice: 145,
+				} as any
+			);
 		});
 		expect(mockPostMessage).toHaveBeenCalledWith({
 			type: 'stock',
 			payload: JSON.stringify({
-				title: 'Stock: AAPL',
+				title: 'Stock: AAPL dropped below $160',
 				options: {
-					body: 'New price: $150.00 (Previous: $145.00)',
-					icon: '/icon-192x192.png',
+					body: 'Current Price: $150',
+					icon: '/manifest-192x192.png',
 				},
 			}),
 		});

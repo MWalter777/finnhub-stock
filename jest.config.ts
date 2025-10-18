@@ -7,7 +7,6 @@ const createJestConfig = nextJest({
 const config = {
 	clearMocks: true,
 	preset: 'ts-jest',
-	collectCoverage: true,
 	coverageDirectory: 'coverage',
 	moduleNameMapper: {
 		'^@/(.*)$': '<rootDir>/src/$1',

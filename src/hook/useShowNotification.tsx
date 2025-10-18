@@ -37,7 +37,7 @@ export const useShowNotification = () => {
 			const title = `Stock: ${h.stock.symbol} dropped below $${h.alertPrice}`;
 			const options: NotificationOptions = {
 				body: `Current Price: $${newPrice.price}`,
-				icon: '/icon-192x192.png',
+				icon: '/manifest-192x192.png',
 			};
 			sendNotification(title, options);
 		}
