@@ -97,6 +97,9 @@ export const useStockSocket = (enabledSocket = false): UseStockSocketReturn => {
 						}
 					}
 				});
+			} else if (socketRef.current && !isEnabledSocket) {
+				socketRef.current.close();
+				socketRef.current = null;
 			}
 		}
 
