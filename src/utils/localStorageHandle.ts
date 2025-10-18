@@ -111,6 +111,38 @@ const initialData: StockHistory[] = [
 			},
 		],
 	},
+	{
+		stock: {
+			currency: 'USD',
+			description: 'BTC-USD',
+			displaySymbol: 'BTC-USD',
+			figi: 'BBG001STEST',
+			isin: null,
+			mic: 'BTC-USD',
+			shareClassFIGI: 'BBG001STEST',
+			symbol: 'BTC-USD',
+			symbol2: 'BTC-USD',
+			type: 'Common Stock',
+		},
+		alertPrice: 107094,
+		prices: [],
+	},
+	{
+		stock: {
+			currency: 'USD',
+			description: 'ETH-USD',
+			displaySymbol: 'ETH-USD',
+			figi: 'BBG001STESTETH-USD',
+			isin: null,
+			mic: 'ETH-USD',
+			shareClassFIGI: 'BBG001STESTETH-USD',
+			symbol: 'ETH-USD',
+			symbol2: 'ETH-USD',
+			type: 'Common Stock',
+		},
+		alertPrice: 3873.54,
+		prices: [],
+	},
 ];
 
 const SAVE_LAST_50 = 50;
